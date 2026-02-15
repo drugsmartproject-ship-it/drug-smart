@@ -1,4 +1,4 @@
-import { postgres } from '@neondatabase/vite-plugin-postgres'
+import { postgres } from 'vite-plugin-db'
 
 export default postgres({
   seed: {

@@ -19,12 +19,12 @@ import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as DemoBetterAuthRouteImport } from './routes/demo/better-auth'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
-import { Route as AppUsersRouteImport } from './routes/app/users'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
-import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppIntelligenceRouteImport } from './routes/app/intelligence'
+import { Route as AppUsersIndexRouteImport } from './routes/app/users/index'
 import { Route as AppSalesIndexRouteImport } from './routes/app/sales/index'
 import { Route as AppNewTransactionIndexRouteImport } from './routes/app/new-transaction/index'
+import { Route as AppInventoryIndexRouteImport } from './routes/app/inventory/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
@@ -85,24 +85,19 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRouteRoute,
 } as any)
-const AppUsersRoute = AppUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppInventoryRoute = AppInventoryRouteImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppIntelligenceRoute = AppIntelligenceRouteImport.update({
   id: '/intelligence',
   path: '/intelligence',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppUsersIndexRoute = AppUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppSalesIndexRoute = AppSalesIndexRouteImport.update({
@@ -113,6 +108,11 @@ const AppSalesIndexRoute = AppSalesIndexRouteImport.update({
 const AppNewTransactionIndexRoute = AppNewTransactionIndexRouteImport.update({
   id: '/new-transaction/',
   path: '/new-transaction/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppInventoryIndexRoute = AppInventoryIndexRouteImport.update({
+  id: '/inventory/',
+  path: '/inventory/',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
@@ -166,9 +166,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/app/intelligence': typeof AppIntelligenceRoute
-  '/app/inventory': typeof AppInventoryRoute
   '/app/settings': typeof AppSettingsRoute
-  '/app/users': typeof AppUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/better-auth': typeof DemoBetterAuthRoute
@@ -181,8 +179,10 @@ export interface FileRoutesByFullPath {
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/app/inventory/': typeof AppInventoryIndexRoute
   '/app/new-transaction/': typeof AppNewTransactionIndexRoute
   '/app/sales/': typeof AppSalesIndexRoute
+  '/app/users/': typeof AppUsersIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -192,9 +192,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteRouteWithChildren
   '/app/intelligence': typeof AppIntelligenceRoute
-  '/app/inventory': typeof AppInventoryRoute
   '/app/settings': typeof AppSettingsRoute
-  '/app/users': typeof AppUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/better-auth': typeof DemoBetterAuthRoute
@@ -207,8 +205,10 @@ export interface FileRoutesByTo {
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/app/inventory': typeof AppInventoryIndexRoute
   '/app/new-transaction': typeof AppNewTransactionIndexRoute
   '/app/sales': typeof AppSalesIndexRoute
+  '/app/users': typeof AppUsersIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -220,9 +220,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteRouteWithChildren
   '/auth': typeof AuthRouteRouteWithChildren
   '/app/intelligence': typeof AppIntelligenceRoute
-  '/app/inventory': typeof AppInventoryRoute
   '/app/settings': typeof AppSettingsRoute
-  '/app/users': typeof AppUsersRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/demo/better-auth': typeof DemoBetterAuthRoute
@@ -235,8 +233,10 @@ export interface FileRoutesById {
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/app/inventory/': typeof AppInventoryIndexRoute
   '/app/new-transaction/': typeof AppNewTransactionIndexRoute
   '/app/sales/': typeof AppSalesIndexRoute
+  '/app/users/': typeof AppUsersIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -249,9 +249,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/intelligence'
-    | '/app/inventory'
     | '/app/settings'
-    | '/app/users'
     | '/auth/login'
     | '/auth/register'
     | '/demo/better-auth'
@@ -264,8 +262,10 @@ export interface FileRouteTypes {
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/app/inventory/'
     | '/app/new-transaction/'
     | '/app/sales/'
+    | '/app/users/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -275,9 +275,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/app/intelligence'
-    | '/app/inventory'
     | '/app/settings'
-    | '/app/users'
     | '/auth/login'
     | '/auth/register'
     | '/demo/better-auth'
@@ -290,8 +288,10 @@ export interface FileRouteTypes {
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/app/inventory'
     | '/app/new-transaction'
     | '/app/sales'
+    | '/app/users'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -302,9 +302,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/intelligence'
-    | '/app/inventory'
     | '/app/settings'
-    | '/app/users'
     | '/auth/login'
     | '/auth/register'
     | '/demo/better-auth'
@@ -317,8 +315,10 @@ export interface FileRouteTypes {
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/app/inventory/'
     | '/app/new-transaction/'
     | '/app/sales/'
+    | '/app/users/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -416,13 +416,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/app/users': {
-      id: '/app/users'
-      path: '/users'
-      fullPath: '/app/users'
-      preLoaderRoute: typeof AppUsersRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/app/settings': {
       id: '/app/settings'
       path: '/settings'
@@ -430,18 +423,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/app/inventory': {
-      id: '/app/inventory'
-      path: '/inventory'
-      fullPath: '/app/inventory'
-      preLoaderRoute: typeof AppInventoryRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/app/intelligence': {
       id: '/app/intelligence'
       path: '/intelligence'
       fullPath: '/app/intelligence'
       preLoaderRoute: typeof AppIntelligenceRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/users/': {
+      id: '/app/users/'
+      path: '/users'
+      fullPath: '/app/users/'
+      preLoaderRoute: typeof AppUsersIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/app/sales/': {
@@ -456,6 +449,13 @@ declare module '@tanstack/react-router' {
       path: '/new-transaction'
       fullPath: '/app/new-transaction/'
       preLoaderRoute: typeof AppNewTransactionIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/inventory/': {
+      id: '/app/inventory/'
+      path: '/inventory'
+      fullPath: '/app/inventory/'
+      preLoaderRoute: typeof AppInventoryIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/demo/start/server-funcs': {
@@ -526,22 +526,22 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteRouteChildren {
   AppIntelligenceRoute: typeof AppIntelligenceRoute
-  AppInventoryRoute: typeof AppInventoryRoute
   AppSettingsRoute: typeof AppSettingsRoute
-  AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppInventoryIndexRoute: typeof AppInventoryIndexRoute
   AppNewTransactionIndexRoute: typeof AppNewTransactionIndexRoute
   AppSalesIndexRoute: typeof AppSalesIndexRoute
+  AppUsersIndexRoute: typeof AppUsersIndexRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppIntelligenceRoute: AppIntelligenceRoute,
-  AppInventoryRoute: AppInventoryRoute,
   AppSettingsRoute: AppSettingsRoute,
-  AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
+  AppInventoryIndexRoute: AppInventoryIndexRoute,
   AppNewTransactionIndexRoute: AppNewTransactionIndexRoute,
   AppSalesIndexRoute: AppSalesIndexRoute,
+  AppUsersIndexRoute: AppUsersIndexRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
