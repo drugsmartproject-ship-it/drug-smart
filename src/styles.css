@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+
+@import 'tw-animate-css';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+body {
+  @apply m-0;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+:root {
+  /* Primary Colors */
+  --primary: #1fa67a; /* Medical Green */
+  --primary-foreground: #ffffff;
+
+  --accent: #2fb9b3; /* Teal Accent */
+  --accent-foreground: #ffffff;
+
+  /* Secondary Colors & Backgrounds */
+  --background: #ffffff;
+  --foreground: #1f2933; /* Primary Text */
+
+  --card: #ffffff;
+  --card-foreground: #1f2933;
+
+  --popover: #ffffff;
+  --popover-foreground: #1f2933;
+
+  --secondary: #eaf6f9; /* Soft Blue */
+  --secondary-foreground: #1fa67a;
+
+  --muted: #f4f6f8; /* Light Grey */
+  --muted-foreground: #6b7280; /* Secondary Text */
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #eaf6f9;
+  --input: #f4f6f8;
+  --ring: #1fa67a;
+
+  --radius: 0.625rem;
+
+  /* Sidebar (optional, reusing scheme) */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1f2933;
+  --sidebar-primary: #1fa67a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eaf6f9;
+  --sidebar-accent-foreground: #1fa67a;
+  --sidebar-border: #eaf6f9;
+  --sidebar-ring: #1fa67a;
+}
+
+.dark {
+  /* Dark mode variants (Approximation based on spec colors for dark mode context) */
+  --background: #1f2933;
+  --foreground: #ffffff;
+
+  --card: #2d3748;
+  --card-foreground: #ffffff;
+
+  --popover: #2d3748;
+  --popover-foreground: #ffffff;
+
+  --primary: #1fa67a;
+  --primary-foreground: #ffffff;
+
+  --secondary: #2c353f;
+  --secondary-foreground: #1fa67a;
+
+  --muted: #374151;
+  --muted-foreground: #9ca3af;
+
+  --accent: #2fb9b3;
+  --accent-foreground: #ffffff;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #374151;
+  --input: #374151;
+  --ring: #2fb9b3;
+
+  --sidebar: #1f2933;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #1fa67a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2c353f;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #374151;
+  --sidebar-ring: #2fb9b3;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
