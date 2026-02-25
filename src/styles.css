@@ -2,7 +2,7 @@
 
 @import 'tw-animate-css';
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -31,87 +31,90 @@ code {
 }
 
 :root {
-  /* Primary Colors */
-  --primary: #1fa67a; /* Medical Green */
+  /* === Theme Colors (overridden dynamically by ThemeProvider) === */
+  --primary: #16a34a;
+  --primary-dark: #15803d;
   --primary-foreground: #ffffff;
 
-  --accent: #2fb9b3; /* Teal Accent */
+  --accent: #0d9488;
+  --accent-dark: #0f766e;
   --accent-foreground: #ffffff;
 
   /* Secondary Colors & Backgrounds */
-  --background: #ffffff;
-  --foreground: #1f2933; /* Primary Text */
+  --background: #f8fafc;
+  --foreground: #0f172a;
 
   --card: #ffffff;
-  --card-foreground: #1f2933;
+  --card-foreground: #0f172a;
 
   --popover: #ffffff;
-  --popover-foreground: #1f2933;
+  --popover-foreground: #0f172a;
 
-  --secondary: #eaf6f9; /* Soft Blue */
-  --secondary-foreground: #1fa67a;
+  --secondary: #dcfce7;
+  --secondary-foreground: #16a34a;
 
-  --muted: #f4f6f8; /* Light Grey */
-  --muted-foreground: #6b7280; /* Secondary Text */
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
 
-  --destructive: #ef4444;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
 
-  --border: #eaf6f9;
-  --input: #f4f6f8;
-  --ring: #1fa67a;
+  --border: #bbf7d0;
+  --input: #f1f5f9;
+  --ring: #16a34a;
 
-  --radius: 0.625rem;
+  --radius: 0.75rem;
 
-  /* Sidebar (optional, reusing scheme) */
+  /* Sidebar */
   --sidebar: #ffffff;
-  --sidebar-foreground: #1f2933;
-  --sidebar-primary: #1fa67a;
+  --sidebar-foreground: #0f172a;
+  --sidebar-primary: #16a34a;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eaf6f9;
-  --sidebar-accent-foreground: #1fa67a;
-  --sidebar-border: #eaf6f9;
-  --sidebar-ring: #1fa67a;
+  --sidebar-accent: #dcfce7;
+  --sidebar-accent-foreground: #16a34a;
+  --sidebar-border: #bbf7d0;
+  --sidebar-ring: #16a34a;
 }
 
 .dark {
-  /* Dark mode variants (Approximation based on spec colors for dark mode context) */
-  --background: #1f2933;
-  --foreground: #ffffff;
+  --background: #0c1218;
+  --foreground: #f1f5f9;
 
-  --card: #2d3748;
-  --card-foreground: #ffffff;
+  --card: #161d27;
+  --card-foreground: #f1f5f9;
 
-  --popover: #2d3748;
-  --popover-foreground: #ffffff;
+  --popover: #161d27;
+  --popover-foreground: #f1f5f9;
 
-  --primary: #1fa67a;
+  --primary: #16a34a;
+  --primary-dark: #15803d;
   --primary-foreground: #ffffff;
 
-  --secondary: #2c353f;
-  --secondary-foreground: #1fa67a;
+  --secondary: #1a2d1e;
+  --secondary-foreground: #4ade80;
 
-  --muted: #374151;
-  --muted-foreground: #9ca3af;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
 
-  --accent: #2fb9b3;
+  --accent: #0d9488;
+  --accent-dark: #0f766e;
   --accent-foreground: #ffffff;
 
-  --destructive: #ef4444;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
 
-  --border: #374151;
-  --input: #374151;
-  --ring: #2fb9b3;
+  --border: #1e293b;
+  --input: #1e293b;
+  --ring: #4ade80;
 
-  --sidebar: #1f2933;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #1fa67a;
+  --sidebar: #0c1218;
+  --sidebar-foreground: #f1f5f9;
+  --sidebar-primary: #16a34a;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2c353f;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #374151;
-  --sidebar-ring: #2fb9b3;
+  --sidebar-accent: #1a2d1e;
+  --sidebar-accent-foreground: #f1f5f9;
+  --sidebar-border: #1e293b;
+  --sidebar-ring: #4ade80;
 }
 
 @theme inline {
@@ -153,8 +156,94 @@ code {
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* Smooth transitions for theme changes */
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.15s ease,
+      box-shadow 0.2s ease;
   }
+
+  /* Don't animate transitions on interactive elements (avoids jarring UX) */
+  input,
+  button,
+  select,
+  textarea {
+    transition: none;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ========================================
+   CUSTOM UTILITY CLASSES
+   ======================================== */
+
+/* Primary gradient using CSS vars */
+.bg-theme-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+}
+
+.bg-theme-gradient-soft {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary) 10%, white),
+    color-mix(in srgb, var(--accent) 10%, white)
+  );
+}
+
+.text-theme-primary {
+  color: var(--primary);
+}
+
+.border-theme-primary {
+  border-color: var(--primary);
+}
+
+.shadow-theme {
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--primary) 20%, transparent);
+}
+
+.ring-theme {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Glassmorphism helper */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Premium card */
+.card-premium {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Animated gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle page gradient background */
+.page-bg {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--primary) 3%, #f8fafc) 0%,
+    #f8fafc 50%,
+    color-mix(in srgb, var(--accent) 3%, #f8fafc) 100%
+  );
+  min-height: 100vh;
 }

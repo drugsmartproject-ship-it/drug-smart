@@ -23,6 +23,7 @@ import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppIntelligenceRouteImport } from './routes/app/intelligence'
 import { Route as AppUsersIndexRouteImport } from './routes/app/users/index'
 import { Route as AppSalesIndexRouteImport } from './routes/app/sales/index'
+import { Route as AppPatientsIndexRouteImport } from './routes/app/patients/index'
 import { Route as AppNewTransactionIndexRouteImport } from './routes/app/new-transaction/index'
 import { Route as AppInventoryIndexRouteImport } from './routes/app/inventory/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
@@ -105,6 +106,11 @@ const AppSalesIndexRoute = AppSalesIndexRouteImport.update({
   path: '/sales/',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppPatientsIndexRoute = AppPatientsIndexRouteImport.update({
+  id: '/patients/',
+  path: '/patients/',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppNewTransactionIndexRoute = AppNewTransactionIndexRouteImport.update({
   id: '/new-transaction/',
   path: '/new-transaction/',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/app/inventory/': typeof AppInventoryIndexRoute
   '/app/new-transaction/': typeof AppNewTransactionIndexRoute
+  '/app/patients/': typeof AppPatientsIndexRoute
   '/app/sales/': typeof AppSalesIndexRoute
   '/app/users/': typeof AppUsersIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/app/inventory': typeof AppInventoryIndexRoute
   '/app/new-transaction': typeof AppNewTransactionIndexRoute
+  '/app/patients': typeof AppPatientsIndexRoute
   '/app/sales': typeof AppSalesIndexRoute
   '/app/users': typeof AppUsersIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/app/inventory/': typeof AppInventoryIndexRoute
   '/app/new-transaction/': typeof AppNewTransactionIndexRoute
+  '/app/patients/': typeof AppPatientsIndexRoute
   '/app/sales/': typeof AppSalesIndexRoute
   '/app/users/': typeof AppUsersIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -264,6 +273,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/app/inventory/'
     | '/app/new-transaction/'
+    | '/app/patients/'
     | '/app/sales/'
     | '/app/users/'
     | '/demo/start/ssr/data-only'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/app/inventory'
     | '/app/new-transaction'
+    | '/app/patients'
     | '/app/sales'
     | '/app/users'
     | '/demo/start/ssr/data-only'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/app/inventory/'
     | '/app/new-transaction/'
+    | '/app/patients/'
     | '/app/sales/'
     | '/app/users/'
     | '/demo/start/ssr/data-only'
@@ -444,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSalesIndexRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/patients/': {
+      id: '/app/patients/'
+      path: '/patients'
+      fullPath: '/app/patients/'
+      preLoaderRoute: typeof AppPatientsIndexRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/new-transaction/': {
       id: '/app/new-transaction/'
       path: '/new-transaction'
@@ -530,6 +549,7 @@ interface AppRouteRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppInventoryIndexRoute: typeof AppInventoryIndexRoute
   AppNewTransactionIndexRoute: typeof AppNewTransactionIndexRoute
+  AppPatientsIndexRoute: typeof AppPatientsIndexRoute
   AppSalesIndexRoute: typeof AppSalesIndexRoute
   AppUsersIndexRoute: typeof AppUsersIndexRoute
 }
@@ -540,6 +560,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppInventoryIndexRoute: AppInventoryIndexRoute,
   AppNewTransactionIndexRoute: AppNewTransactionIndexRoute,
+  AppPatientsIndexRoute: AppPatientsIndexRoute,
   AppSalesIndexRoute: AppSalesIndexRoute,
   AppUsersIndexRoute: AppUsersIndexRoute,
 }

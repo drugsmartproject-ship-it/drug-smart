@@ -1,13 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import {
-  Users,
-  UserCheck,
-  UserX,
-  ShieldCheck,
-  LucideIcon,
-  Crown,
-  UserCog,
-} from 'lucide-react'
+import { Users, UserCheck, UserX, UserCog, LucideIcon } from 'lucide-react'
+import { useTheme } from '@/lib/theme-context'
 
 interface Stats {
   total: number
@@ -29,10 +21,11 @@ interface StatCardProps {
   title: string
   value: number
   icon: LucideIcon
-  gradient?: string
-  iconBg?: string
-  iconColor?: string
-  textColor?: string
+  gradient: string
+  iconStyle: React.CSSProperties
+  labelStyle: string
+  valueStyle: string
+  accentColor: string
 }
 
 function StatCard({
@@ -40,80 +33,116 @@ function StatCard({
   value,
   icon: Icon,
   gradient,
-  iconBg,
-  iconColor,
-  textColor,
+  iconStyle,
+  labelStyle,
+  valueStyle,
+  accentColor,
 }: StatCardProps) {
   return (
-    <Card
-      className={`border-2 hover:shadow-lg transition-all rounded-2xl ${
-        gradient || 'border-slate-200 hover:border-primary/30'
-      }`}
+    <div
+      className={`rounded-2xl p-5 border-2 relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all duration-300 ${gradient}`}
+      style={{
+        boxShadow: `0 4px 20px color-mix(in srgb, ${accentColor} 12%, transparent)`,
+      }}
     >
-      <CardHeader className="pb-3">
-        <div
-          className={`h-10 w-10 rounded-xl flex items-center justify-center mb-2 ${iconBg || 'bg-slate-100'}`}
-        >
-          <Icon className={`h-5 w-5 ${iconColor || 'text-slate-600'}`} />
-        </div>
-        <CardTitle
-          className={`text-3xl font-black ${textColor || 'text-slate-900'}`}
+      <div
+        className="absolute -top-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-15 group-hover:opacity-30 transition-opacity duration-500"
+        style={{
+          background: `radial-gradient(circle, ${accentColor}, transparent)`,
+        }}
+      />
+
+      <div
+        className="h-10 w-10 rounded-xl flex items-center justify-center mb-4 relative z-10"
+        style={iconStyle}
+      >
+        <Icon className="h-5 w-5" />
+      </div>
+
+      <div className="relative z-10">
+        <p
+          className={`text-3xl font-black tracking-tight mb-0.5 ${valueStyle}`}
         >
           {value}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+        </p>
         <p
-          className={`text-sm font-semibold ${textColor ? textColor.replace('900', '700') : 'text-slate-500'}`}
+          className={`text-xs font-bold uppercase tracking-wide ${labelStyle}`}
         >
           {title}
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 
 export function UserStats({ stats }: UserStatsProps) {
+  const { theme } = useTheme()
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <StatCard
-        title="Total Users"
-        value={stats.total}
-        icon={Users}
-        gradient="bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-200"
-        iconBg="bg-indigo-100"
-        iconColor="text-indigo-600"
-        textColor="text-indigo-900"
-      />
+      {/* Total — Theme gradient */}
+      <div
+        className="rounded-2xl p-5 relative overflow-hidden group cursor-pointer hover:scale-[1.02] transition-all duration-300"
+        style={{
+          background: `linear-gradient(135deg, ${theme.primary}, ${theme.accent})`,
+          boxShadow: `0 12px 32px color-mix(in srgb, ${theme.primary} 30%, transparent)`,
+        }}
+      >
+        <div
+          className="absolute -top-4 -right-4 w-24 h-24 rounded-full blur-2xl opacity-20"
+          style={{ background: 'radial-gradient(circle, white, transparent)' }}
+        />
+        <div className="h-10 w-10 rounded-xl flex items-center justify-center mb-4 bg-white/20 backdrop-blur-sm">
+          <Users className="h-5 w-5 text-white" />
+        </div>
+        <p className="text-3xl font-black tracking-tight text-white mb-0.5">
+          {stats.total}
+        </p>
+        <p className="text-xs font-bold uppercase tracking-wide text-white/70">
+          Total Users
+        </p>
+      </div>
 
       <StatCard
-        title="Active Now"
+        title="Active Users"
         value={stats.active}
         icon={UserCheck}
         gradient="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-200"
-        iconBg="bg-emerald-100"
-        iconColor="text-emerald-600"
-        textColor="text-emerald-900"
+        iconStyle={{
+          background: 'linear-gradient(135deg, #10b981, #0d9488)',
+          color: 'white',
+        }}
+        labelStyle="text-emerald-600"
+        valueStyle="text-emerald-900"
+        accentColor="#10b981"
       />
 
       <StatCard
         title="Inactive Users"
         value={stats.inactive}
         icon={UserX}
-        gradient="bg-gradient-to-br from-gray-50 to-slate-50 border-gray-200"
-        iconBg="bg-gray-100"
-        iconColor="text-gray-600"
-        textColor="text-gray-900"
+        gradient="bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200"
+        iconStyle={{
+          background: 'linear-gradient(135deg, #64748b, #475569)',
+          color: 'white',
+        }}
+        labelStyle="text-slate-500"
+        valueStyle="text-slate-800"
+        accentColor="#64748b"
       />
 
       <StatCard
         title="Managers"
         value={stats.roles.manager}
         icon={UserCog}
-        gradient="bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200"
-        iconBg="bg-purple-100"
-        iconColor="text-purple-600"
-        textColor="text-purple-900"
+        gradient="bg-gradient-to-br from-violet-50 to-purple-50 border-violet-200"
+        iconStyle={{
+          background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+          color: 'white',
+        }}
+        labelStyle="text-violet-600"
+        valueStyle="text-violet-900"
+        accentColor="#7c3aed"
       />
     </div>
   )

@@ -22,6 +22,7 @@ import {
   ArrowUpDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTheme } from '@/lib/theme-context'
 
 export interface Drug {
   id: string
@@ -78,11 +79,23 @@ function getStatusBadge(status: Drug['status']) {
 }
 
 export function InventoryTable({ drugs }: InventoryTableProps) {
+  const { theme } = useTheme()
   return (
-    <Card className="border-2 border-slate-200 rounded-2xl overflow-hidden">
+    <Card
+      className="border rounded-2xl overflow-hidden bg-white"
+      style={{
+        borderColor: `color-mix(in srgb, ${theme.primary} 10%, #e2e8f0)`,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+      }}
+    >
       <Table>
         <TableHeader>
-          <TableRow className="bg-slate-50 hover:bg-slate-50">
+          <TableRow
+            className="hover:bg-slate-50"
+            style={{
+              background: `color-mix(in srgb, ${theme.primary} 3%, #f8fafc)`,
+            }}
+          >
             <TableHead className="font-black text-slate-900">
               <Button
                 variant="ghost"
@@ -135,8 +148,16 @@ export function InventoryTable({ drugs }: InventoryTableProps) {
               >
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center flex-shrink-0">
-                      <Pill className="h-5 w-5 text-primary" />
+                    <div
+                      className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: `color-mix(in srgb, ${theme.primary} 8%, color-mix(in srgb, ${theme.accent} 5%, #f8fafc))`,
+                      }}
+                    >
+                      <Pill
+                        className="h-5 w-5"
+                        style={{ color: theme.primary }}
+                      />
                     </div>
                     <div className="min-w-0">
                       <div className="font-bold text-slate-900 truncate">
@@ -191,7 +212,18 @@ export function InventoryTable({ drugs }: InventoryTableProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 rounded-lg hover:bg-primary/10 hover:text-primary"
+                      className="h-9 w-9 rounded-lg transition-colors"
+                      style={{}}
+                      onMouseEnter={(e) => {
+                        ;(e.currentTarget as HTMLElement).style.background =
+                          `color-mix(in srgb, ${theme.primary} 10%, transparent)`
+                        ;(e.currentTarget as HTMLElement).style.color =
+                          theme.primary
+                      }}
+                      onMouseLeave={(e) => {
+                        ;(e.currentTarget as HTMLElement).style.background = ''
+                        ;(e.currentTarget as HTMLElement).style.color = ''
+                      }}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
