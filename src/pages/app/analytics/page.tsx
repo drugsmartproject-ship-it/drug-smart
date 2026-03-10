@@ -222,10 +222,10 @@ export default function AnalyticsPage() {
                           <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0">{item.quantity} sold</Badge>
                         </div>
                       </div>
-                      <div className="w-full h-1.5 bg-muted rounded-full">
+                      <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
-                          style={{ width: `${pct}%` }}
+                          style={{ width: `${Math.min(pct, 100)}%` }}
                         />
                       </div>
                     </div>
