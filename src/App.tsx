@@ -25,7 +25,7 @@ import AnalyticsPage from "@/pages/app/AnalyticsPage";
 import UsersPage from "@/pages/app/UsersPage";
 import SettingsPage from "@/pages/app/SettingsPage";
 
-const convexUrl = process.env.VITE_CONVEX_URL as string;
+const convexUrl = import.meta.env.VITE_CONVEX_SITE_URL as string;
 const convex = new ConvexReactClient(convexUrl);
 
 function AnimatedRoutes() {
