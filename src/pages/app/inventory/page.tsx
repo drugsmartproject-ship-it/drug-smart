@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { formatCurrency, formatDate, daysUntilExpiry } from "@/lib/utils";
 import { DRUG_CATEGORIES, PERMISSIONS } from "@/types";
 import type { Id } from "@convex/_generated/dataModel";
@@ -84,8 +84,6 @@ export default function InventoryPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const { toast } = useToast();
-
   const items = useQuery(api.inventory.list, {
     pharmacyId,
     category: categoryFilter !== "all" ? categoryFilter : undefined,
@@ -126,9 +124,9 @@ export default function InventoryPage() {
   };
 
   const handleSubmit = async () => {
-    if (!form.name.trim()) { toast({ variant: "destructive", title: "Drug name is required" }); return; }
-    if (!form.category) { toast({ variant: "destructive", title: "Category is required" }); return; }
-    if (!form.sellingPrice || isNaN(Number(form.sellingPrice))) { toast({ variant: "destructive", title: "Valid selling price required" }); return; }
+    if (!form.name.trim()) { toast.error("Drug name is required"); return; }
+    if (!form.category) { toast.error("Category is required"); return; }
+    if (!form.sellingPrice || isNaN(Number(form.sellingPrice))) { toast.error("Valid selling price required"); return; }
 
     setIsSubmitting(true);
     try {
@@ -150,7 +148,7 @@ export default function InventoryPage() {
           storageCondition: form.storageCondition || undefined,
           requiresPrescription: form.requiresPrescription,
         });
-        toast({ title: "Drug updated", description: `${form.name} has been updated.` });
+        toast.success("Drug updated", { description: `${form.name} has been updated.` });
       } else {
         await addItem({
           pharmacyId,
@@ -169,11 +167,11 @@ export default function InventoryPage() {
           storageCondition: form.storageCondition || undefined,
           requiresPrescription: form.requiresPrescription,
         });
-        toast({ title: "Drug added", description: `${form.name} has been added to inventory.` });
+        toast.success("Drug added", { description: `${form.name} has been added to inventory.` });
       }
       setShowAddDialog(false);
     } catch (err) {
-      toast({ variant: "destructive", title: "Error", description: err instanceof Error ? err.message : "Failed to save" });
+      toast.error("Error", { description: err instanceof Error ? err.message : "Failed to save" });
     } finally {
       setIsSubmitting(false);
     }
@@ -183,9 +181,9 @@ export default function InventoryPage() {
     if (!confirm(`Remove "${name}" from inventory?`)) return;
     try {
       await deactivateItem({ id: id as Id<"inventoryItems"> });
-      toast({ title: "Item removed", description: `${name} has been removed from inventory.` });
+      toast.success("Item removed", { description: `${name} has been removed from inventory.` });
     } catch {
-      toast({ variant: "destructive", title: "Failed to remove item" });
+      toast.error("Failed to remove item");
     }
   };
 

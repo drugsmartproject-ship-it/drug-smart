@@ -2,18 +2,17 @@ import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Copy, Pill, ArrowRight, Users, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export default function RegistrationSuccessPage() {
   const [params] = useSearchParams();
   const pharmacyId = params.get("pharmacyId") ?? "PH-UNKNOWN";
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
 
   const copyId = () => {
     navigator.clipboard.writeText(pharmacyId).then(() => {
       setCopied(true);
-      toast({ title: "Pharmacy ID copied to clipboard" });
+      toast.success("Pharmacy ID copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
     });
   };

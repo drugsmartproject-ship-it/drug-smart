@@ -12,21 +12,22 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { ROLE_LABELS } from "@/types";
 import { cn } from "@/lib/utils";
 import {
   Settings, Building2, Bell, Shield, Copy, CheckCircle2,
   Save, Package, Palette, Upload, X, Image, RotateCcw,
+  Sun, Moon, Monitor,
 } from "lucide-react";
+import type { ColorMode } from "@/features/theme/ThemeContext";
 
 export default function SettingsPage() {
   const { user, pharmacy } = useAuth();
   const pharmacyId = user?.pharmacyId ?? "";
-  const { toast } = useToast();
   const [idCopied, setIdCopied] = useState(false);
 
-  const { themeId, logoUrl, setTheme, setLogo, resetTheme, setCustomPrimary } = useTheme();
+  const { themeId, logoUrl, colorMode, setTheme, setLogo, resetTheme, setCustomPrimary, setColorMode } = useTheme();
   const [selectedTheme, setSelectedTheme] = useState<ThemeId>(themeId);
   const [customColor, setCustomColor] = useState("");
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -91,9 +92,9 @@ export default function SettingsPage() {
     setIsSavingDetails(true);
     try {
       await updateDetails({ pharmacyId, ...detailsForm });
-      toast({ title: "Pharmacy details updated" });
+      toast.success("Pharmacy details updated");
     } catch {
-      toast({ variant: "destructive", title: "Failed to update details" });
+      toast.error("Failed to update details");
     } finally {
       setIsSavingDetails(false);
     }
@@ -103,9 +104,9 @@ export default function SettingsPage() {
     setIsSavingSettings(true);
     try {
       await updateSettings({ pharmacyId, ...settingsForm });
-      toast({ title: "Settings saved" });
+      toast.success("Settings saved");
     } catch {
-      toast({ variant: "destructive", title: "Failed to save settings" });
+      toast.error("Failed to save settings");
     } finally {
       setIsSavingSettings(false);
     }
@@ -121,7 +122,7 @@ export default function SettingsPage() {
     setSelectedTheme(id);
     setTheme(id, pharmacyId);
     setCustomColor("");
-    toast({ title: "Theme applied", description: THEME_PRESETS.find((t) => t.id === id)?.name });
+    toast.success("Theme applied", { description: THEME_PRESETS.find((t) => t.id === id)?.name });
   };
 
   const handleCustomColor = (hex: string) => {
@@ -133,27 +134,27 @@ export default function SettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 500 * 1024) {
-      toast({ variant: "destructive", title: "Logo too large", description: "Max 500 KB" });
+      toast.error("Logo too large", { description: "Max 500 KB" });
       return;
     }
     const reader = new FileReader();
     reader.onload = (ev) => {
       setLogo(ev.target?.result as string, pharmacyId);
-      toast({ title: "Logo updated" });
+      toast.success("Logo updated");
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemoveLogo = () => {
     setLogo(null, pharmacyId);
-    toast({ title: "Logo removed" });
+    toast.success("Logo removed");
   };
 
   const handleResetBranding = () => {
     resetTheme(pharmacyId);
     setSelectedTheme("medical-green");
     setCustomColor("");
-    toast({ title: "Branding reset to defaults" });
+    toast.success("Branding reset to defaults");
   };
 
   return (
@@ -268,6 +269,40 @@ export default function SettingsPage() {
                     {selectedTheme === preset.id && !customColor && (
                       <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
                     )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Color Mode */}
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                Color Mode
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { value: "light" as ColorMode, icon: Sun, label: "Light", description: "Clean white interface" },
+                  { value: "dark" as ColorMode, icon: Moon, label: "Dark", description: "Dark surfaces, easy on the eyes" },
+                  { value: "system" as ColorMode, icon: Monitor, label: "System", description: "Follows OS preference" },
+                ]).map((mode) => (
+                  <button
+                    key={mode.value}
+                    type="button"
+                    onClick={() => setColorMode(mode.value, pharmacyId)}
+                    className={cn(
+                      "flex flex-col items-center gap-2 p-3 rounded-xl border-2 text-center transition-all hover:shadow-sm",
+                      colorMode === mode.value
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border hover:border-gray-300"
+                    )}
+                  >
+                    <mode.icon className={cn("w-5 h-5", colorMode === mode.value ? "text-primary" : "text-muted-foreground")} />
+                    <div>
+                      <p className="text-xs font-semibold text-foreground">{mode.label}</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">{mode.description}</p>
+                    </div>
                   </button>
                 ))}
               </div>

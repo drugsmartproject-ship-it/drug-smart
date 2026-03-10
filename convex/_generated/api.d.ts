@@ -12,6 +12,7 @@ import type * as auth from "../auth.js";
 import type * as inventory from "../inventory.js";
 import type * as pharmacies from "../pharmacies.js";
 import type * as sales from "../sales.js";
+import type * as seed from "../seed.js";
 import type * as suppliers from "../suppliers.js";
 import type * as users from "../users.js";
 import type * as utils from "../utils.js";
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   inventory: typeof inventory;
   pharmacies: typeof pharmacies;
   sales: typeof sales;
+  seed: typeof seed;
   suppliers: typeof suppliers;
   users: typeof users;
   utils: typeof utils;

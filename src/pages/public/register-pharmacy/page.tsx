@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
   Pill, Building2, User, Mail, Phone, MapPin, Hash,
@@ -69,7 +69,6 @@ export default function RegisterPharmacyPage() {
   const { registerPharmacy } = useAuth();
   const { setTheme, setLogo } = useTheme();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const set = (field: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -102,7 +101,7 @@ export default function RegisterPharmacyPage() {
   const handleNext = () => {
     const error = validateStep(step);
     if (error) {
-      toast({ variant: "destructive", title: "Validation Error", description: error });
+      toast.error("Validation Error", { description: error });
       return;
     }
     goTo(step + 1);
@@ -112,7 +111,7 @@ export default function RegisterPharmacyPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 500 * 1024) {
-      toast({ variant: "destructive", title: "Logo too large", description: "Please use an image under 500 KB" });
+      toast.error("Logo too large", { description: "Please use an image under 500 KB" });
       return;
     }
     const reader = new FileReader();
@@ -143,9 +142,7 @@ export default function RegisterPharmacyPage() {
       if (logoPreview) setLogo(logoPreview, pharmacyId);
       navigate(`/registration-success?pharmacyId=${pharmacyId}`);
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Registration Failed",
+      toast.error("Registration Failed", {
         description: err instanceof Error ? err.message : "Something went wrong. Please try again.",
       });
     } finally {
@@ -156,7 +153,7 @@ export default function RegisterPharmacyPage() {
   const handleSubmit = async () => {
     const error = validateStep(3);
     if (error) {
-      toast({ variant: "destructive", title: "Validation Error", description: error });
+      toast.error("Validation Error", { description: error });
       return;
     }
     await doSubmit();

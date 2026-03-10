@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { formatDate, initials } from "@/lib/utils";
 import { ROLE_LABELS, type UserRole } from "@/types";
 import type { Id } from "@convex/_generated/dataModel";
@@ -41,8 +41,6 @@ export default function UsersPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", password: "", role: "cashier" as Exclude<UserRole, "owner"> });
 
-  const { toast } = useToast();
-
   const users = useQuery(api.users.list, { pharmacyId });
   const stats = useQuery(api.users.getStats, { pharmacyId });
 
@@ -58,21 +56,21 @@ export default function UsersPage() {
 
   const handleAddStaff = async () => {
     if (!form.name.trim() || !form.email.trim() || !form.password) {
-      toast({ variant: "destructive", title: "All fields are required" });
+      toast.error("All fields are required");
       return;
     }
     if (form.password.length < 8) {
-      toast({ variant: "destructive", title: "Password must be at least 8 characters" });
+      toast.error("Password must be at least 8 characters");
       return;
     }
     setIsSubmitting(true);
     try {
       await addStaff({ pharmacyId, name: form.name, email: form.email, password: form.password, role: form.role });
-      toast({ title: "Staff member added", description: `${form.name} has been added to your workspace.` });
+      toast.success("Staff member added", { description: `${form.name} has been added to your workspace.` });
       setShowAddDialog(false);
       setForm({ name: "", email: "", password: "", role: "cashier" });
     } catch (err) {
-      toast({ variant: "destructive", title: "Failed to add staff", description: err instanceof Error ? err.message : "Unknown error" });
+      toast.error("Failed to add staff", { description: err instanceof Error ? err.message : "Unknown error" });
     } finally {
       setIsSubmitting(false);
     }
@@ -81,18 +79,18 @@ export default function UsersPage() {
   const handleToggleActive = async (userId: string, currentState: boolean, name: string) => {
     try {
       await toggleActive({ userId: userId as Id<"users">, isActive: !currentState });
-      toast({ title: `${name} ${!currentState ? "activated" : "deactivated"}` });
+      toast.success(`${name} ${!currentState ? "activated" : "deactivated"}`);
     } catch {
-      toast({ variant: "destructive", title: "Failed to update user status" });
+      toast.error("Failed to update user status");
     }
   };
 
   const handleRoleChange = async (userId: string, newRole: Exclude<UserRole, "owner">, name: string) => {
     try {
       await updateRole({ userId: userId as Id<"users">, role: newRole });
-      toast({ title: "Role updated", description: `${name} is now a ${ROLE_LABELS[newRole]}` });
+      toast.success("Role updated", { description: `${name} is now a ${ROLE_LABELS[newRole]}` });
     } catch {
-      toast({ variant: "destructive", title: "Failed to update role" });
+      toast.error("Failed to update role");
     }
   };
 

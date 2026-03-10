@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import type { CartItem, PaymentMethod } from "@/types";
 import type { Id } from "@convex/_generated/dataModel";
@@ -133,8 +133,6 @@ export default function SalesPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
 
-  const { toast } = useToast();
-
   const inventoryItems = useQuery(api.inventory.list, {
     pharmacyId,
     search: search || undefined,
@@ -151,14 +149,14 @@ export default function SalesPage() {
 
   const addToCart = useCallback((item: NonNullable<typeof inventoryItems>[0]) => {
     if (item.quantity === 0) {
-      toast({ variant: "destructive", title: "Out of stock", description: `${item.name} has no available stock` });
+      toast.error("Out of stock", { description: `${item.name} has no available stock` });
       return;
     }
     setCart((prev) => {
       const existing = prev.find((c) => c.inventoryItemId === item._id);
       if (existing) {
         if (existing.quantity >= item.quantity) {
-          toast({ variant: "destructive", title: "Max quantity reached" });
+          toast.error("Max quantity reached");
           return prev;
         }
         return prev.map((c) =>
@@ -174,7 +172,7 @@ export default function SalesPage() {
         maxQuantity: item.quantity,
       }];
     });
-  }, [toast]);
+  }, []);
 
   const updateQuantity = (id: string, delta: number) => {
     setCart((prev) => prev.map((c) => {
@@ -197,11 +195,11 @@ export default function SalesPage() {
 
   const handleProcessSale = async () => {
     if (cart.length === 0) {
-      toast({ variant: "destructive", title: "Cart is empty" });
+      toast.error("Cart is empty");
       return;
     }
     if (paymentMethod === "cash" && Number(amountPaid) < total) {
-      toast({ variant: "destructive", title: "Insufficient payment", description: `Amount paid must be at least ${formatCurrency(total)}` });
+      toast.error("Insufficient payment", { description: `Amount paid must be at least ${formatCurrency(total)}` });
       return;
     }
 
@@ -237,11 +235,7 @@ export default function SalesPage() {
       });
       clearCart();
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Sale failed",
-        description: err instanceof Error ? err.message : "Could not process sale",
-      });
+      toast.error("Sale failed", { description: err instanceof Error ? err.message : "Could not process sale" });
     } finally {
       setIsProcessing(false);
     }
