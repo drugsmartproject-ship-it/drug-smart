@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+/* ============================================================
+   TAILWIND v4 THEME CONFIGURATION
+   ============================================================ */
+@theme {
+  /* Font */
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+
+  /* Colors — using CSS variables for runtime theming */
+  --color-background: hsl(210 20% 98%);
+  --color-foreground: hsl(215 25% 15%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(215 25% 15%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(215 25% 15%);
+  --color-primary: hsl(161 68% 39%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(210 16% 93%);
+  --color-secondary-foreground: hsl(215 25% 25%);
+  --color-muted: hsl(210 16% 96%);
+  --color-muted-foreground: hsl(215 14% 45%);
+  --color-accent: hsl(182 60% 45%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  --color-destructive: hsl(0 72% 51%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+  --color-border: hsl(214 18% 90%);
+  --color-input: hsl(214 18% 90%);
+  --color-ring: hsl(161 68% 39%);
+
+  /* Brand */
+  --color-brand-green: #1FA67A;
+  --color-brand-teal: #2FB9B3;
+  --color-brand-green-dark: #17845F;
+  --color-brand-teal-dark: #259E98;
+  --color-brand-green-light: #E6F7F2;
+  --color-brand-teal-light: #E6F7F7;
+
+  /* Status */
+  --color-status-low-stock: #F59E0B;
+  --color-status-out-of-stock: #EF4444;
+  --color-status-expiring: #F97316;
+  --color-status-active: #10B981;
+
+  /* Animations */
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-slide-in-right: slide-in-right 0.3s ease-out;
+  --animate-spin: spin 1s linear infinite;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes accordion-down {
+    from { height: 0; }
+    to { height: var(--radix-accordion-content-height); }
+  }
+  @keyframes accordion-up {
+    from { height: var(--radix-accordion-content-height); }
+    to { height: 0; }
+  }
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+@layer base {
+  *, *::before, *::after {
+    border-color: var(--color-border);
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.025em;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); }
+}
+
+/* ============================================================
+   COMPONENT UTILITIES
+   ============================================================ */
+@layer components {
+  .stat-card {
+    background-color: var(--color-card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-border);
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 150ms;
+    text-decoration: none;
+  }
+
+  .nav-item-active {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    color: var(--color-primary);
+  }
+
+  .nav-item-inactive {
+    color: var(--color-muted-foreground);
+  }
+  .nav-item-inactive:hover {
+    background-color: var(--color-muted);
+    color: var(--color-foreground);
+  }
+
+  .data-table {
+    width: 100%;
+    font-size: 0.875rem;
+  }
+
+  .data-table thead {
+    background-color: color-mix(in srgb, var(--color-muted) 50%, transparent);
+  }
+
+  .data-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted-foreground);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .data-table td {
+    padding: 0.875rem 1rem;
+    color: var(--color-foreground);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  }
+
+  .data-table tbody tr:hover {
+    background-color: color-mix(in srgb, var(--color-muted) 30%, transparent);
+  }
+}
