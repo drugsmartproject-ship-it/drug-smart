@@ -1,8 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "@/features/auth/AuthContext";
+import { ThemeProvider } from "@/features/theme/ThemeContext";
 import { ProtectedRoute, PublicOnlyRoute } from "@/features/auth/ProtectedRoute";
 import { AppShell } from "@/layouts/AppShell";
+import { PageTransition } from "@/components/motion/PageTransition";
 import { Toaster } from "@/components/ui/toaster";
 
 // Public Pages
@@ -25,112 +28,144 @@ import SettingsPage from "@/pages/app/SettingsPage";
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string;
 const convex = new ConvexReactClient(convexUrl);
 
-function AppLayout({ children }: { children: React.ReactNode }) {
+function AnimatedRoutes() {
+  const location = useLocation();
+
   return (
-    <ProtectedRoute>
-      <AppShell>{children}</AppShell>
-    </ProtectedRoute>
+    <AnimatePresence mode="wait" initial={false}>
+      <Routes location={location} key={location.pathname}>
+        {/* Public routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route
+          path="/register-pharmacy"
+          element={
+            <PublicOnlyRoute>
+              <RegisterPharmacyPage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PublicOnlyRoute>
+              <LoginPage />
+            </PublicOnlyRoute>
+          }
+        />
+        <Route path="/registration-success" element={<RegistrationSuccessPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+        {/* Protected app routes — each wrapped in PageTransition for enter animation */}
+        <Route
+          path="/app/dashboard"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <PageTransition><DashboardPage /></PageTransition>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/inventory"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <PageTransition><InventoryPage /></PageTransition>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/sales"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <ProtectedRoute requiredPermission="canProcessSales">
+                  <PageTransition><SalesPage /></PageTransition>
+                </ProtectedRoute>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/drug-intelligence"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <ProtectedRoute requiredPermission="canAccessDrugIntel">
+                  <PageTransition><DrugIntelligencePage /></PageTransition>
+                </ProtectedRoute>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/clinical-support"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <ProtectedRoute requiredPermission="canAccessDrugIntel">
+                  <PageTransition><ClinicalSupportPage /></PageTransition>
+                </ProtectedRoute>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/analytics"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <ProtectedRoute requiredPermission="canAccessAnalytics">
+                  <PageTransition><AnalyticsPage /></PageTransition>
+                </ProtectedRoute>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/users"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <ProtectedRoute requiredPermission="canManageUsers">
+                  <PageTransition><UsersPage /></PageTransition>
+                </ProtectedRoute>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/settings"
+          element={
+            <ProtectedRoute>
+              <AppShell>
+                <PageTransition><SettingsPage /></PageTransition>
+              </AppShell>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Fallbacks */}
+        <Route path="/app" element={<Navigate to="/app/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AnimatePresence>
   );
 }
 
 export default function App() {
   return (
     <ConvexProvider client={convex}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route
-              path="/register-pharmacy"
-              element={
-                <PublicOnlyRoute>
-                  <RegisterPharmacyPage />
-                </PublicOnlyRoute>
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <PublicOnlyRoute>
-                  <LoginPage />
-                </PublicOnlyRoute>
-              }
-            />
-            <Route path="/registration-success" element={<RegistrationSuccessPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-
-            {/* Protected app routes */}
-            <Route
-              path="/app/dashboard"
-              element={<AppLayout><DashboardPage /></AppLayout>}
-            />
-            <Route
-              path="/app/inventory"
-              element={<AppLayout><InventoryPage /></AppLayout>}
-            />
-            <Route
-              path="/app/sales"
-              element={
-                <AppLayout>
-                  <ProtectedRoute requiredPermission="canProcessSales">
-                    <SalesPage />
-                  </ProtectedRoute>
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/app/drug-intelligence"
-              element={
-                <AppLayout>
-                  <ProtectedRoute requiredPermission="canAccessDrugIntel">
-                    <DrugIntelligencePage />
-                  </ProtectedRoute>
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/app/clinical-support"
-              element={
-                <AppLayout>
-                  <ProtectedRoute requiredPermission="canAccessDrugIntel">
-                    <ClinicalSupportPage />
-                  </ProtectedRoute>
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/app/analytics"
-              element={
-                <AppLayout>
-                  <ProtectedRoute requiredPermission="canAccessAnalytics">
-                    <AnalyticsPage />
-                  </ProtectedRoute>
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/app/users"
-              element={
-                <AppLayout>
-                  <ProtectedRoute requiredPermission="canManageUsers">
-                    <UsersPage />
-                  </ProtectedRoute>
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/app/settings"
-              element={<AppLayout><SettingsPage /></AppLayout>}
-            />
-
-            {/* Fallbacks */}
-            <Route path="/app" element={<Navigate to="/app/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-          <Toaster />
-        </BrowserRouter>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <AnimatedRoutes />
+            <Toaster />
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
     </ConvexProvider>
   );
 }
