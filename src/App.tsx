@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useRoutes } from "react-router-dom";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { AnimatePresence } from "framer-motion";
@@ -7,6 +8,7 @@ import { ProtectedRoute, PublicOnlyRoute } from "@/features/auth/ProtectedRoute"
 import { AppShell } from "@/layouts/AppShell";
 import { PageTransition } from "@/components/motion/PageTransition";
 import { Toaster } from "sonner";
+import { TourProvider } from "@/features/tour/TourProvider";
 
 // Public Pages
 import LandingPage from "@/pages/public/LandingPage";
@@ -121,12 +123,22 @@ function AppRoutes() {
 }
 
 export default function App() {
+  useEffect(() => {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+    splash.classList.add("hiding");
+    const t = setTimeout(() => splash.remove(), 380);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
     <ConvexProvider client={convex}>
       <ThemeProvider>
         <AuthProvider>
           <BrowserRouter>
-            <AppRoutes />
+            <TourProvider>
+              <AppRoutes />
+            </TourProvider>
             <Toaster position="top-right" richColors closeButton />
           </BrowserRouter>
         </AuthProvider>

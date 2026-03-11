@@ -47,7 +47,7 @@ function StatCard({
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest mb-2">{title}</p>
-          <p className="text-2xl font-bold text-foreground tracking-tight mb-0.5">{value}</p>
+          <p className="text-xl sm:text-2xl font-bold text-foreground tracking-tight mb-0.5">{value}</p>
           {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
           {trend && (
             <div className={`inline-flex items-center gap-1 text-xs font-semibold mt-1.5 ${trend.positive ? "text-emerald-600" : "text-red-500"}`}>
@@ -84,7 +84,7 @@ export default function DashboardPage() {
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>

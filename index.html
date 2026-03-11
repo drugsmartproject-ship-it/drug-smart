@@ -2,12 +2,95 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="DrugSmart — Pharmacy Management System for Ghanaian pharmacies" />
+    <meta name="theme-color" content="#1FA67A" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="DrugSmart" />
     <title>DrugSmart — Pharmacy Management</title>
+    <style>
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #17B97F 0%, #0DA5A0 100%);
+        transition: opacity 0.35s ease, visibility 0.35s ease;
+      }
+      #splash.hiding {
+        opacity: 0;
+        visibility: hidden;
+      }
+      #splash-icon {
+        width: 88px;
+        height: 88px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        margin-bottom: 20px;
+      }
+      #splash-icon img {
+        width: 100%;
+        height: 100%;
+      }
+      #splash-name {
+        color: #fff;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.4px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        margin: 0;
+      }
+      #splash-sub {
+        color: rgba(255,255,255,0.72);
+        font-size: 13px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        margin: 5px 0 0;
+        letter-spacing: 0.1px;
+      }
+      #splash-dots {
+        display: flex;
+        gap: 7px;
+        margin-top: 36px;
+      }
+      #splash-dots span {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.85);
+        animation: splash-pulse 1.3s ease-in-out infinite;
+      }
+      #splash-dots span:nth-child(2) { animation-delay: 0.18s; }
+      #splash-dots span:nth-child(3) { animation-delay: 0.36s; }
+      @keyframes splash-pulse {
+        0%, 80%, 100% { transform: scale(0.55); opacity: 0.45; }
+        40%            { transform: scale(1);    opacity: 1; }
+      }
+    </style>
   </head>
   <body>
+    <!-- Splash screen: visible before JS loads, removed by React after first render -->
+    <div id="splash">
+      <div id="splash-icon">
+        <img src="/icon.svg" alt="DrugSmart" />
+      </div>
+      <p id="splash-name">DrugSmart</p>
+      <p id="splash-sub">Pharmacy Management</p>
+      <div id="splash-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

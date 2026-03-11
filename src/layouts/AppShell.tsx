@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Pill, LayoutDashboard, Package, ShoppingCart, Brain,
+  LayoutDashboard, Package, ShoppingCart, Brain,
   Stethoscope, BarChart3, Users, Settings, LogOut,
   Menu, X, ChevronDown, Bell, Building2, Activity,
   AlertTriangle, Clock, CheckCheck,
@@ -28,16 +28,17 @@ interface NavItem {
   label: string;
   icon: React.ElementType;
   permission?: keyof typeof PERMISSIONS;
+  tourId?: string;
 }
 
 function getNavItems(role: UserRole): NavItem[] {
   const all: NavItem[] = [
-    { href: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/app/inventory", label: "Inventory", icon: Package, permission: "canViewInventory" },
-    { href: "/app/sales", label: "Sales", icon: ShoppingCart, permission: "canProcessSales" },
-    { href: "/app/drug-intelligence", label: "Drug Intelligence", icon: Brain, permission: "canAccessDrugIntel" },
+    { href: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard, tourId: "tour-nav-dashboard" },
+    { href: "/app/inventory", label: "Inventory", icon: Package, permission: "canViewInventory", tourId: "tour-nav-inventory" },
+    { href: "/app/sales", label: "Sales", icon: ShoppingCart, permission: "canProcessSales", tourId: "tour-nav-sales" },
+    { href: "/app/drug-intelligence", label: "Drug Intelligence", icon: Brain, permission: "canAccessDrugIntel", tourId: "tour-nav-drug-intel" },
     { href: "/app/clinical-support", label: "Clinical Support", icon: Stethoscope, permission: "canAccessDrugIntel" },
-    { href: "/app/analytics", label: "Analytics", icon: BarChart3, permission: "canAccessAnalytics" },
+    { href: "/app/analytics", label: "Analytics", icon: BarChart3, permission: "canAccessAnalytics", tourId: "tour-nav-analytics" },
     { href: "/app/users", label: "User Management", icon: Users, permission: "canManageUsers" },
     { href: "/app/settings", label: "Settings", icon: Settings, permission: "canManageSettings" },
   ];
@@ -61,6 +62,7 @@ function NavLink({ item, isActive, onClick }: { item: NavItem; isActive: boolean
     <Link
       to={item.href}
       onClick={onClick}
+      data-tour={item.tourId}
       className={cn(
         "nav-item group",
         isActive ? "nav-item-active" : "nav-item-inactive"
@@ -75,58 +77,64 @@ function NavLink({ item, isActive, onClick }: { item: NavItem; isActive: boolean
   );
 }
 
-function NotificationPanel({ pharmacyId }: { pharmacyId: string }) {
-  // Static demo notifications — in production these would come from Convex
-  const notifications = [
-    {
-      id: "1",
-      type: "warning" as const,
-      title: "Low Stock Alert",
-      body: "Paracetamol 500mg is below reorder level",
-      time: "2 min ago",
-    },
-    {
-      id: "2",
-      type: "danger" as const,
-      title: "Expiry Warning",
-      body: "3 items expiring within 30 days",
-      time: "1 hr ago",
-    },
-    {
-      id: "3",
-      type: "info" as const,
-      title: "Daily Summary",
-      body: "15 transactions completed today",
-      time: "Today",
-    },
-  ];
+const NOTIFICATIONS = [
+  {
+    id: "1",
+    type: "warning" as const,
+    title: "Low Stock Alert",
+    body: "Paracetamol 500mg is below reorder level",
+    time: "2 min ago",
+  },
+  {
+    id: "2",
+    type: "danger" as const,
+    title: "Expiry Warning",
+    body: "3 items expiring within 30 days",
+    time: "1 hr ago",
+  },
+  {
+    id: "3",
+    type: "info" as const,
+    title: "Daily Summary",
+    body: "15 transactions completed today",
+    time: "Today",
+  },
+];
 
-  const iconFor = (type: "warning" | "danger" | "info") => {
-    if (type === "warning") return <AlertTriangle className="w-4 h-4 text-amber-500" />;
-    if (type === "danger") return <Clock className="w-4 h-4 text-red-500" />;
-    return <Activity className="w-4 h-4 text-blue-500" />;
-  };
+function notifIcon(type: "warning" | "danger" | "info") {
+  if (type === "warning") return <AlertTriangle className="w-4 h-4 text-amber-500" />;
+  if (type === "danger") return <Clock className="w-4 h-4 text-red-500" />;
+  return <Activity className="w-4 h-4 text-blue-500" />;
+}
 
-  const bgFor = (type: "warning" | "danger" | "info") => {
-    if (type === "warning") return "bg-amber-50 dark:bg-amber-950/40";
-    if (type === "danger") return "bg-red-50 dark:bg-red-950/40";
-    return "bg-blue-50 dark:bg-blue-950/40";
-  };
+function notifBg(type: "warning" | "danger" | "info") {
+  if (type === "warning") return "bg-amber-50 dark:bg-amber-950/40";
+  if (type === "danger") return "bg-red-50 dark:bg-red-950/40";
+  return "bg-blue-50 dark:bg-blue-950/40";
+}
 
+function NotificationList({ onClose }: { onClose?: () => void }) {
   return (
-    <div className="w-80">
+    <>
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
         <p className="text-sm font-semibold text-foreground">Notifications</p>
-        <button className="flex items-center gap-1 text-xs text-primary hover:underline">
-          <CheckCheck className="w-3 h-3" />
-          Mark all read
-        </button>
+        <div className="flex items-center gap-3">
+          <button className="flex items-center gap-1 text-xs text-primary hover:underline">
+            <CheckCheck className="w-3 h-3" />
+            Mark all read
+          </button>
+          {onClose && (
+            <button onClick={onClose} className="p-1 rounded-lg hover:bg-muted transition-colors">
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          )}
+        </div>
       </div>
       <div className="divide-y divide-border">
-        {notifications.map((n) => (
-          <div key={n.id} className="flex items-start gap-3 px-4 py-3 hover:bg-muted/50 transition-colors cursor-pointer">
-            <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5", bgFor(n.type))}>
-              {iconFor(n.type)}
+        {NOTIFICATIONS.map((n) => (
+          <div key={n.id} className="flex items-start gap-3 px-4 py-3.5 hover:bg-muted/50 transition-colors cursor-pointer">
+            <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5", notifBg(n.type))}>
+              {notifIcon(n.type)}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-foreground">{n.title}</p>
@@ -141,7 +149,7 @@ function NotificationPanel({ pharmacyId }: { pharmacyId: string }) {
           View all alerts →
         </Link>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -153,7 +161,7 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
   const navItems = user ? getNavItems(user.role) : [];
 
   const handleLogout = async () => {
-    clearAppliedTheme(); // Reset CSS vars immediately so next workspace starts clean
+    clearAppliedTheme();
     await logout();
     navigate("/login");
   };
@@ -162,11 +170,13 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
     <div className="flex flex-col h-full">
       {/* Logo / Brand */}
       <div className="flex items-center gap-2.5 px-4 py-4 border-b border-border">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-brand-green)] to-[var(--color-brand-teal)] flex items-center justify-center shadow-sm shrink-0 overflow-hidden">
+        <div className="w-8 h-8 rounded-lg shrink-0 overflow-hidden shadow-sm">
           {logoUrl ? (
-            <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
+            <div className="w-full h-full bg-gradient-to-br from-[var(--color-brand-green)] to-[var(--color-brand-teal)] flex items-center justify-center">
+              <img src={logoUrl} alt="Logo" className="w-full h-full object-contain" />
+            </div>
           ) : (
-            <Pill className="w-4 h-4 text-white" />
+            <img src="/icon.svg" alt="DrugSmart" className="w-full h-full" />
           )}
         </div>
         <div className="min-w-0 flex-1">
@@ -183,9 +193,9 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
         </div>
       </div>
 
-      {/* Navigation — no entrance animations on route change */}
+      {/* Navigation */}
       <ScrollArea className="flex-1 px-3 py-2">
-        <nav className="space-y-0.5">
+        <nav className="space-y-0.5" data-tour="tour-nav">
           {navItems.map((item) => {
             const isActive =
               location.pathname === item.href ||
@@ -212,7 +222,7 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
       <div className="p-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-muted transition-colors group">
+            <button data-tour="tour-user-profile" className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-muted transition-colors group">
               <Avatar className="h-8 w-8 shrink-0">
                 <AvatarFallback className="text-xs bg-primary/10 text-primary font-semibold">
                   {initials(user?.name ?? "U")}
@@ -257,11 +267,11 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [notifOpen, setNotifOpen] = useState(false);
+  const [mobileNotifOpen, setMobileNotifOpen] = useState(false);
+  const [desktopNotifOpen, setDesktopNotifOpen] = useState(false);
   const { user } = useAuth();
   const { loadForPharmacy } = useTheme();
 
-  // Load pharmacy-specific theme on mount / user change
   useEffect(() => {
     if (user?.pharmacyId) {
       loadForPharmacy(user.pharmacyId);
@@ -306,6 +316,31 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         )}
       </AnimatePresence>
 
+      {/* Mobile Notification Panel — full-screen slide from right */}
+      <AnimatePresence>
+        {mobileNotifOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex justify-end">
+            <motion.div
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMobileNotifOpen(false)}
+            />
+            <motion.div
+              className="relative w-full max-w-sm bg-card flex flex-col shadow-xl z-10 h-full"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <NotificationList onClose={() => setMobileNotifOpen(false)} />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top Header */}
@@ -321,16 +356,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2">
-            {/* Notification Bell */}
-            <Popover open={notifOpen} onOpenChange={setNotifOpen}>
+            {/* Mobile bell — triggers full-screen panel */}
+            <button
+              data-tour="tour-bell"
+              className="lg:hidden relative p-1.5 rounded-lg hover:bg-muted transition-colors group"
+              onClick={() => setMobileNotifOpen(true)}
+            >
+              <Bell className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-red-500" />
+            </button>
+
+            {/* Desktop bell — Popover */}
+            <Popover open={desktopNotifOpen} onOpenChange={setDesktopNotifOpen}>
               <PopoverTrigger asChild>
-                <button className="relative p-1.5 rounded-lg hover:bg-muted transition-colors group">
+                <button data-tour="tour-bell" className="hidden lg:flex relative p-1.5 rounded-lg hover:bg-muted transition-colors group">
                   <Bell className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                   <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-red-500" />
                 </button>
               </PopoverTrigger>
               <PopoverContent align="end" className="p-0 w-80" sideOffset={8}>
-                <NotificationPanel pharmacyId={user?.pharmacyId ?? ""} />
+                <NotificationList />
               </PopoverContent>
             </Popover>
 

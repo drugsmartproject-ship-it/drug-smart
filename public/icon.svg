@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#17B97F"/>
+      <stop offset="100%" stop-color="#0DA5A0"/>
+    </linearGradient>
+    <filter id="pill-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="rgba(0,0,0,0.22)"/>
+    </filter>
+    <clipPath id="pill-clip">
+      <rect x="-140" y="-58" width="280" height="116" rx="58"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+
+  <!-- Subtle top-left sheen -->
+  <ellipse cx="180" cy="130" rx="180" ry="100" fill="white" opacity="0.07"/>
+
+  <!-- Pill group, centered and rotated 45° -->
+  <g transform="translate(256,256) rotate(-45)" filter="url(#pill-shadow)">
+
+    <!-- Full pill outline / background (slight inset shadow illusion) -->
+    <rect x="-140" y="-58" width="280" height="116" rx="58" fill="white" opacity="0.18"/>
+
+    <!-- Left half — bright white -->
+    <g clip-path="url(#pill-clip)">
+      <rect x="-140" y="-58" width="140" height="116" fill="white"/>
+      <!-- Right half — translucent -->
+      <rect x="0"    y="-58" width="140" height="116" fill="white" opacity="0.28"/>
+      <!-- Centre groove -->
+      <rect x="-3"   y="-58" width="6"   height="116" fill="rgba(10,150,130,0.45)"/>
+    </g>
+
+    <!-- Pill border -->
+    <rect x="-140" y="-58" width="280" height="116" rx="58" stroke="white" stroke-opacity="0.25" stroke-width="3" fill="none"/>
+  </g>
+</svg>

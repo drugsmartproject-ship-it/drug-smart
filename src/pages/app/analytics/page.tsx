@@ -38,7 +38,7 @@ export default function AnalyticsPage() {
   }));
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -85,7 +85,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Charts Row */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4">
         {/* Revenue Trend */}
         <Card className="lg:col-span-2">
           <CardHeader className="pb-2">
@@ -166,7 +166,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Bottom Row */}
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-4">
         {/* Transaction Volume Chart */}
         <Card>
           <CardHeader className="pb-2">
@@ -212,14 +212,14 @@ export default function AnalyticsPage() {
                   const pct = (item.revenue / maxRevenue) * 100;
                   return (
                     <div key={item.id}>
-                      <div className="flex items-center justify-between mb-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-muted-foreground w-4">{idx + 1}</span>
-                          <span className="text-xs font-medium truncate max-w-[160px]">{item.name}</span>
+                      <div className="flex items-center justify-between gap-2 mb-0.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xs font-bold text-muted-foreground w-4 shrink-0">{idx + 1}</span>
+                          <span className="text-xs font-medium truncate">{item.name}</span>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right shrink-0">
                           <span className="text-xs font-bold">{formatCurrency(item.revenue)}</span>
-                          <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0">{item.quantity} sold</Badge>
+                          <Badge variant="secondary" className="ml-1.5 text-[10px] px-1.5 py-0">{item.quantity} sold</Badge>
                         </div>
                       </div>
                       <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">

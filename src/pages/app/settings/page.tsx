@@ -18,14 +18,16 @@ import { cn } from "@/lib/utils";
 import {
   Settings, Building2, Bell, Shield, Copy, CheckCircle2,
   Save, Package, Palette, Upload, X, Image, RotateCcw,
-  Sun, Moon, Monitor,
+  Sun, Moon, Monitor, HelpCircle, PlayCircle,
 } from "lucide-react";
 import type { ColorMode } from "@/features/theme/ThemeContext";
+import { useTour } from "@/features/tour/TourProvider";
 
 export default function SettingsPage() {
   const { user, pharmacy } = useAuth();
   const pharmacyId = user?.pharmacyId ?? "";
   const [idCopied, setIdCopied] = useState(false);
+  const { startTour } = useTour();
 
   const { themeId, logoUrl, colorMode, setTheme, setLogo, resetTheme, setCustomPrimary, setColorMode } = useTheme();
   const [selectedTheme, setSelectedTheme] = useState<ThemeId>(themeId);
@@ -158,7 +160,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
@@ -638,6 +640,29 @@ export default function SettingsPage() {
               <p className="text-xs text-muted-foreground mb-0.5">Timezone</p>
               <p className="font-medium">Africa/Accra (GMT+0)</p>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Help & Onboarding */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <HelpCircle className="w-4 h-4 text-primary" />
+            Help & Onboarding
+          </CardTitle>
+          <CardDescription>Guided tour and support resources</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">App Tour</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Replay the guided walkthrough of DrugSmart's key features</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={startTour} className="gap-2 shrink-0">
+              <PlayCircle className="w-4 h-4" />
+              Replay Tour
+            </Button>
           </div>
         </CardContent>
       </Card>
