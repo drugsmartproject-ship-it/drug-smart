@@ -70,7 +70,7 @@ const stats = [
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -80,22 +80,25 @@ export default function LandingPage() {
                 <Pill className="w-4 h-4 text-white" />
               </div>
               <span className="text-lg font-bold text-gray-900">DrugSmart</span>
-              <Badge variant="brand" className="text-[10px] px-1.5 py-0 ml-1">Ghana</Badge>
+              <Badge variant="brand" className="hidden sm:inline-flex text-[10px] px-1.5 py-0 ml-1">Ghana</Badge>
             </div>
             <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Features</a>
-              <a href="#benefits" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Benefits</a>
-              <a href="#pricing" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
+              <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Features</button>
+              <button onClick={() => document.getElementById("benefits")?.scrollIntoView({ behavior: "smooth" })} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Benefits</button>
             </div>
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" asChild>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
                 <Link to="/login">Log In</Link>
               </Button>
               <Button size="sm" asChild className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-0">
                 <Link to="/register-pharmacy">
-                  Register Free
+                  <span className="hidden sm:inline">Register Free</span>
+                  <span className="sm:hidden">Get Started</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+              </Button>
+              <Button variant="ghost" size="sm" asChild className="sm:hidden">
+                <Link to="/login">Log In</Link>
               </Button>
             </div>
           </div>
@@ -103,20 +106,20 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-emerald-50/30 to-teal-50/20 pt-20 pb-24">
+      <section className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-emerald-50/30 to-teal-50/20 pt-12 pb-16 sm:pt-20 sm:pb-24">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMwLTkuOTQtOC4wNi0xOC0xOC0xOFMwIDguMDYgMCAxOHM4LjA2IDE4IDE4IDE4IDE4LTguMDYgMTgtMTh6IiBmaWxsPSIjMUZBNjdBIiBvcGFjaXR5PSIuMDMiLz48L2c+PC9zdmc+')] opacity-40" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium px-3 py-1.5 rounded-full mb-8">
+          <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-medium px-3 py-1.5 rounded-full mb-6 sm:mb-8">
             <Zap className="w-3 h-3" />
             Built for Ghanaian Pharmacies
           </div>
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-            Run your pharmacy<br />
+          <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
+            Run your pharmacy{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
               smarter, faster
             </span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
             DrugSmart is the all-in-one pharmacy management platform designed for independent
             pharmacy shops in Ghana. Inventory, sales, drug intelligence, and team management — in one workspace.
           </p>
@@ -139,7 +142,7 @@ export default function LandingPage() {
         </div>
 
         {/* Stats bar */}
-        <div className="relative max-w-4xl mx-auto px-4 mt-16">
+        <div className="relative max-w-4xl mx-auto px-4 mt-10 sm:mt-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {stats.map((stat) => (
               <div key={stat.label} className="bg-white rounded-xl border border-gray-100 p-4 text-center shadow-sm">
@@ -152,14 +155,14 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="py-24 bg-white">
+      <section id="features" className="py-14 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <Badge variant="brand" className="mb-4">Platform Capabilities</Badge>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <div className="text-center mb-10 sm:mb-16">
+            <Badge variant="brand" className="mb-3 sm:mb-4">Platform Capabilities</Badge>
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
               Everything your pharmacy needs
             </h2>
-            <p className="text-lg text-gray-600 max-w-xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-600 max-w-xl mx-auto">
               From daily dispensing to month-end analytics, DrugSmart covers the full operational lifecycle of your pharmacy.
             </p>
           </div>
@@ -178,15 +181,15 @@ export default function LandingPage() {
       </section>
 
       {/* Benefits */}
-      <section id="benefits" className="py-24 bg-gradient-to-br from-emerald-600 to-teal-700">
+      <section id="benefits" className="py-14 sm:py-24 bg-gradient-to-br from-emerald-600 to-teal-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             <div>
-              <Badge className="bg-white/10 text-white border-white/20 mb-6">Why DrugSmart</Badge>
-              <h2 className="text-4xl font-bold text-white mb-6 leading-tight">
+              <Badge className="bg-white/10 text-white border-white/20 mb-4 sm:mb-6">Why DrugSmart</Badge>
+              <h2 className="text-2xl sm:text-4xl font-bold text-white mb-4 sm:mb-6 leading-tight">
                 Designed for the realities of running a pharmacy in Ghana
               </h2>
-              <p className="text-emerald-100 text-lg leading-relaxed mb-8">
+              <p className="text-emerald-100 text-sm sm:text-lg leading-relaxed mb-6 sm:mb-8">
                 We understand the operational challenges of independent pharmacies: supplier management, stock expiry,
                 staff access control, and the need for real-time business insight. DrugSmart was built around these needs.
               </p>
@@ -218,12 +221,12 @@ export default function LandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-14 sm:py-24 bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
             Ready to modernise your pharmacy?
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-sm sm:text-lg text-gray-600 mb-6 sm:mb-8">
             Join hundreds of pharmacy owners in Ghana who trust DrugSmart to manage their operations.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
