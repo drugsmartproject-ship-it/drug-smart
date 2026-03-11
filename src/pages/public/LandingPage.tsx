@@ -85,6 +85,7 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-8">
               <button onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Features</button>
               <button onClick={() => document.getElementById("benefits")?.scrollIntoView({ behavior: "smooth" })} className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Benefits</button>
+              <Link to="/contact" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">Contact</Link>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
@@ -141,17 +142,6 @@ export default function LandingPage() {
           </p>
         </div>
 
-        {/* Stats bar */}
-        <div className="relative max-w-4xl mx-auto px-4 mt-10 sm:mt-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {stats.map((stat) => (
-              <div key={stat.label} className="bg-white rounded-xl border border-gray-100 p-4 text-center shadow-sm">
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-xs text-gray-500 mt-0.5">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* Features */}
@@ -253,10 +243,12 @@ export default function LandingPage() {
             <span className="text-sm font-semibold text-gray-900">DrugSmart</span>
             <span className="text-xs text-gray-400">· Pharmacy Management Platform</span>
           </div>
-          <p className="text-xs text-gray-400">
-            © {new Date().getFullYear()} DrugSmart. For reference and operational use only.
-            Not a medical prescribing system.
-          </p>
+          <div className="flex items-center gap-4">
+            <Link to="/contact" className="text-xs text-gray-400 hover:text-gray-700 transition-colors">Contact Us</Link>
+            <p className="text-xs text-gray-400">
+              © {new Date().getFullYear()} DrugSmart. For reference and operational use only.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

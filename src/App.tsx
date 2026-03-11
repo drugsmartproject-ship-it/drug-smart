@@ -16,6 +16,7 @@ import RegisterPharmacyPage from "@/pages/public/register-pharmacy/page";
 import LoginPage from "@/pages/public/login/page";
 import RegistrationSuccessPage from "@/pages/public/registration-success/page";
 import ForgotPasswordPage from "@/pages/public/forgot-password/page";
+import ContactPage from "@/pages/public/contact/page";
 
 // App Pages
 import DashboardPage from "@/pages/app/dashboard/page";
@@ -104,6 +105,7 @@ function AppRoutes() {
       <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
       <Route path="/registration-success" element={<RegistrationSuccessPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/contact" element={<ContactPage />} />
 
       {/* Protected shell — AppShell mounts ONCE for all /app/* routes */}
       <Route

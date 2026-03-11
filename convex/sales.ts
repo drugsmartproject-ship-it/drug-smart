@@ -59,9 +59,9 @@ export const processSale = mutation({
     // Validate stock for each item
     for (const item of args.items) {
       const invItem = await ctx.db.get(item.inventoryItemId);
-      if (!invItem) throw new Error(`Item ${item.itemName} not found in inventory`);
+      if (!invItem) throw new Error(`${item.itemName} could not be found in inventory. It may have been removed.`);
       if (invItem.quantity < item.quantity) {
-        throw new Error(`Insufficient stock for ${item.itemName}. Available: ${invItem.quantity}`);
+        throw new Error(`Not enough stock for ${item.itemName}. Only ${invItem.quantity} unit(s) available.`);
       }
     }
 

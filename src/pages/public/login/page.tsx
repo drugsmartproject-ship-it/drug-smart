@@ -42,7 +42,7 @@ export default function LoginPage() {
       toast.success("Welcome back!", { description: "Signed in successfully." });
       navigate(from, { replace: true });
     } catch (err) {
-      setServerError(err instanceof Error ? err.message : "Login failed. Please try again.");
+      setServerError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     }
   };
 

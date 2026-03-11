@@ -141,7 +141,7 @@ export const adjustStock = mutation({
   },
   handler: async (ctx, args) => {
     const item = await ctx.db.get(args.id);
-    if (!item) throw new Error("Item not found");
+    if (!item) throw new Error("This drug could not be found. It may have been removed from inventory.");
     const newQuantity = Math.max(0, item.quantity + args.adjustment);
     await ctx.db.patch(args.id, { quantity: newQuantity, updatedAt: Date.now() });
     return newQuantity;

@@ -157,7 +157,7 @@ export default function SalesPage() {
       const existing = prev.find((c) => c.inventoryItemId === item._id);
       if (existing) {
         if (existing.quantity >= item.quantity) {
-          toast.error("Max quantity reached");
+          toast.error("Maximum quantity reached", { description: `Only ${item.quantity} unit(s) of ${item.name} are available in stock.` });
           return prev;
         }
         return prev.map((c) =>
@@ -196,7 +196,7 @@ export default function SalesPage() {
 
   const handleProcessSale = async () => {
     if (cart.length === 0) {
-      toast.error("Cart is empty");
+      toast.error("Cart is empty", { description: "Add at least one item to the cart before processing a sale." });
       return;
     }
     if (paymentMethod === "cash" && Number(amountPaid) < total) {
@@ -237,7 +237,7 @@ export default function SalesPage() {
       clearCart();
       setMobileView("products");
     } catch (err) {
-      toast.error("Sale failed", { description: err instanceof Error ? err.message : "Could not process sale" });
+      toast.error("Sale could not be completed", { description: err instanceof Error ? err.message : "Something went wrong. Please try again." });
     } finally {
       setIsProcessing(false);
     }

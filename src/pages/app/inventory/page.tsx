@@ -124,9 +124,9 @@ export default function InventoryPage() {
   };
 
   const handleSubmit = async () => {
-    if (!form.name.trim()) { toast.error("Drug name is required"); return; }
-    if (!form.category) { toast.error("Category is required"); return; }
-    if (!form.sellingPrice || isNaN(Number(form.sellingPrice))) { toast.error("Valid selling price required"); return; }
+    if (!form.name.trim()) { toast.error("Drug name is required", { description: "Please enter the name of the drug before saving." }); return; }
+    if (!form.category) { toast.error("Category is required", { description: "Please select a drug category before saving." }); return; }
+    if (!form.sellingPrice || isNaN(Number(form.sellingPrice))) { toast.error("Invalid selling price", { description: "Please enter a valid selling price greater than zero." }); return; }
 
     setIsSubmitting(true);
     try {
@@ -171,7 +171,7 @@ export default function InventoryPage() {
       }
       setShowAddDialog(false);
     } catch (err) {
-      toast.error("Error", { description: err instanceof Error ? err.message : "Failed to save" });
+      toast.error(editingId ? "Couldn't update drug" : "Couldn't add drug", { description: err instanceof Error ? err.message : "Something went wrong. Please try again." });
     } finally {
       setIsSubmitting(false);
     }
@@ -183,7 +183,7 @@ export default function InventoryPage() {
       await deactivateItem({ id: id as Id<"inventoryItems"> });
       toast.success("Item removed", { description: `${name} has been removed from inventory.` });
     } catch {
-      toast.error("Failed to remove item");
+      toast.error("Couldn't remove item", { description: "Something went wrong. Please try again." });
     }
   };
 

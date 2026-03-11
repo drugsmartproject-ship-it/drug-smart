@@ -56,11 +56,11 @@ export default function UsersPage() {
 
   const handleAddStaff = async () => {
     if (!form.name.trim() || !form.email.trim() || !form.password) {
-      toast.error("All fields are required");
+      toast.error("All fields are required", { description: "Please fill in the name, email, and password before adding a staff member." });
       return;
     }
     if (form.password.length < 8) {
-      toast.error("Password must be at least 8 characters");
+      toast.error("Password too short", { description: "The password must be at least 8 characters long." });
       return;
     }
     setIsSubmitting(true);
@@ -70,7 +70,7 @@ export default function UsersPage() {
       setShowAddDialog(false);
       setForm({ name: "", email: "", password: "", role: "cashier" });
     } catch (err) {
-      toast.error("Failed to add staff", { description: err instanceof Error ? err.message : "Unknown error" });
+      toast.error("Couldn't add staff member", { description: err instanceof Error ? err.message : "Something went wrong. Please try again." });
     } finally {
       setIsSubmitting(false);
     }
@@ -81,7 +81,7 @@ export default function UsersPage() {
       await toggleActive({ userId: userId as Id<"users">, isActive: !currentState });
       toast.success(`${name} ${!currentState ? "activated" : "deactivated"}`);
     } catch {
-      toast.error("Failed to update user status");
+      toast.error("Couldn't update user status", { description: "Something went wrong. Please refresh and try again." });
     }
   };
 
@@ -90,7 +90,7 @@ export default function UsersPage() {
       await updateRole({ userId: userId as Id<"users">, role: newRole });
       toast.success("Role updated", { description: `${name} is now a ${ROLE_LABELS[newRole]}` });
     } catch {
-      toast.error("Failed to update role");
+      toast.error("Couldn't update role", { description: "Something went wrong. Please refresh and try again." });
     }
   };
 
