@@ -16,7 +16,7 @@ import type { Id } from "@convex/_generated/dataModel";
 import {
   Search, ShoppingCart, Plus, Minus, Trash2, CheckCircle2,
   CreditCard, Smartphone, Banknote, Clock, Package,
-  Printer, RefreshCw, X,
+  Printer, RefreshCw, X, ChevronRight,
 } from "lucide-react";
 
 const PAYMENT_ICONS: Record<PaymentMethod, React.ElementType> = {
@@ -56,7 +56,6 @@ function ReceiptModal({ receipt, onClose }: { receipt: ReceiptData; onClose: () 
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Receipt */}
           <div className="bg-muted/50 rounded-xl p-4 font-mono text-xs space-y-1">
             <div className="text-center mb-3">
               <p className="text-base font-bold">DrugSmart</p>
@@ -132,13 +131,15 @@ export default function SalesPage() {
   const [customerName, setCustomerName] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [receipt, setReceipt] = useState<ReceiptData | null>(null);
+  // Mobile: toggle between products pane and cart pane
+  const [mobileView, setMobileView] = useState<"products" | "cart">("products");
 
   const inventoryItems = useQuery(api.inventory.list, {
     pharmacyId,
     search: search || undefined,
   });
 
-  const recentSales = useQuery(api.sales.list, { pharmacyId, limit: 10 });
+  const recentSales = useQuery(api.sales.list, { pharmacyId, limit: 8 });
 
   const processSale = useMutation(api.sales.processSale);
 
@@ -234,6 +235,7 @@ export default function SalesPage() {
         timestamp: Date.now(),
       });
       clearCart();
+      setMobileView("products");
     } catch (err) {
       toast.error("Sale failed", { description: err instanceof Error ? err.message : "Could not process sale" });
     } finally {
@@ -241,264 +243,328 @@ export default function SalesPage() {
     }
   };
 
-  return (
-    <div className="flex h-[calc(100vh-3.5rem)] overflow-hidden">
-      {/* Left: Product Search & List */}
-      <div className="flex-1 flex flex-col border-r border-border overflow-hidden">
-        <div className="p-4 border-b border-border">
-          <h1 className="text-lg font-bold mb-3">Point of Sale</h1>
-          <Input
-            placeholder="Search drugs to add to cart…"
-            startIcon={<Search />}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+  const DrugButton = ({ item }: { item: NonNullable<typeof inventoryItems>[0] }) => (
+    <button
+      onClick={() => { addToCart(item); if (window.innerWidth < 1024) setMobileView("cart"); }}
+      disabled={item.quantity === 0}
+      className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:border-primary/30 hover:bg-primary/5 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
+    >
+      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+        <Package className="w-4 h-4 text-primary" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium truncate">{item.name}</p>
+        <p className="text-xs text-muted-foreground">{item.category} · {item.quantity} {item.unit} in stock</p>
+      </div>
+      <div className="text-right shrink-0">
+        <p className="text-sm font-bold text-primary">{formatCurrency(item.sellingPrice)}</p>
+        {item.quantity === 0
+          ? <Badge variant="danger" className="text-[10px]">Out of stock</Badge>
+          : <Plus className="w-3.5 h-3.5 text-muted-foreground ml-auto mt-0.5" />
+        }
+      </div>
+    </button>
+  );
 
-        <div className="flex-1 overflow-auto p-4">
-          {search ? (
-            <div className="space-y-2">
-              {(inventoryItems ?? []).length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Package className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">No drugs found for "{search}"</p>
-                </div>
-              ) : (
-                (inventoryItems ?? []).map((item) => (
-                  <button
-                    key={item._id}
-                    onClick={() => addToCart(item)}
-                    disabled={item.quantity === 0}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl border border-border hover:border-primary/30 hover:bg-primary/5 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <Package className="w-4 h-4 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.category} · {item.quantity} {item.unit}</p>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p className="text-sm font-bold text-primary">{formatCurrency(item.sellingPrice)}</p>
-                      {item.quantity === 0 && <Badge variant="danger" className="text-[10px]">Out of stock</Badge>}
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
-          ) : (
-            /* Recent Sales */
-            <div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                Recent Transactions
-              </p>
-              {(recentSales ?? []).length === 0 ? (
-                <div className="text-center py-12 text-muted-foreground">
-                  <ShoppingCart className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">No transactions yet</p>
-                  <p className="text-xs mt-1">Search for a drug to start a sale</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {(recentSales ?? []).map((sale) => (
-                    <div key={sale._id} className="flex items-center gap-3 p-3 rounded-xl border border-border">
-                      <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                        <ShoppingCart className="w-4 h-4 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-mono font-semibold">{sale.receiptNumber}</p>
-                        <p className="text-[10px] text-muted-foreground">{formatDateTime(sale.createdAt)}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-sm font-bold">{formatCurrency(sale.total)}</p>
-                        <Badge variant={sale.status === "completed" ? "success" : "danger"} className="text-[10px] px-1.5 py-0">
-                          {sale.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+  const ProductsPane = () => (
+    <>
+      {/* Search bar */}
+      <div className="p-4 border-b border-border shrink-0">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-base font-bold">Point of Sale</h1>
+          {/* Mobile: cart toggle button */}
+          <button
+            className="lg:hidden flex items-center gap-1.5 text-xs font-medium text-primary"
+            onClick={() => setMobileView("cart")}
+          >
+            <ShoppingCart className="w-4 h-4" />
+            Cart
+            {cart.length > 0 && (
+              <span className="bg-primary text-primary-foreground text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                {cart.length}
+              </span>
+            )}
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
+        <Input
+          placeholder="Search drugs by name or category…"
+          startIcon={<Search />}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
-      {/* Right: Cart Panel */}
-      <div className="w-80 xl:w-96 flex flex-col bg-card">
-        {/* Cart Header */}
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ShoppingCart className="w-4 h-4 text-muted-foreground" />
-            <span className="font-semibold text-sm">Cart</span>
-            {cart.length > 0 && (
-              <Badge variant="brand" className="text-[10px] px-1.5 py-0">{cart.length}</Badge>
-            )}
-          </div>
-          {cart.length > 0 && (
-            <Button variant="ghost" size="icon-sm" onClick={clearCart}>
-              <X className="w-4 h-4" />
-            </Button>
-          )}
-        </div>
-
-        {/* Cart Items */}
-        <div className="flex-1 overflow-auto p-4">
-          {cart.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
-              <ShoppingCart className="w-10 h-10 mb-3 opacity-20" />
-              <p className="text-sm font-medium">Cart is empty</p>
-              <p className="text-xs mt-1 text-center">Search and select drugs to add them here</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {cart.map((item) => (
-                <div key={item.inventoryItemId} className="bg-muted/50 rounded-xl p-3">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <p className="text-sm font-medium leading-tight">{item.itemName}</p>
-                    <button onClick={() => removeFromCart(item.inventoryItemId)} className="text-muted-foreground hover:text-destructive transition-colors shrink-0">
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => updateQuantity(item.inventoryItemId, -1)}
-                        className="w-6 h-6 rounded-md bg-background border border-border flex items-center justify-center hover:bg-muted transition-colors"
-                      >
-                        <Minus className="w-3 h-3" />
-                      </button>
-                      <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.inventoryItemId, 1)}
-                        disabled={item.quantity >= item.maxQuantity}
-                        className="w-6 h-6 rounded-md bg-background border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-40"
-                      >
-                        <Plus className="w-3 h-3" />
-                      </button>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-muted-foreground">{formatCurrency(item.unitPrice)} each</p>
-                      <p className="text-sm font-bold">{formatCurrency(item.quantity * item.unitPrice)}</p>
-                    </div>
-                  </div>
-                </div>
+      {/* Content */}
+      <div className="flex-1 overflow-auto p-4 space-y-5">
+        {/* Drug list — always visible */}
+        <div>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
+            {search ? `Results for "${search}"` : "Available Products"}
+          </p>
+          {inventoryItems === undefined ? (
+            <div className="space-y-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-[60px] rounded-xl bg-muted animate-pulse" />
               ))}
             </div>
+          ) : inventoryItems.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Package className="w-8 h-8 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">{search ? `No drugs found for "${search}"` : "No products in inventory"}</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {inventoryItems.map((item) => <DrugButton key={item._id} item={item} />)}
+            </div>
           )}
         </div>
 
-        {/* Totals & Payment */}
-        {cart.length > 0 && (
-          <div className="border-t border-border p-4 space-y-3">
-            {/* Customer Name */}
-            <div className="space-y-1">
-              <Label className="text-xs">Customer Name (optional)</Label>
-              <Input
-                placeholder="Walk-in customer"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                className="h-8 text-xs"
-              />
-            </div>
-
-            {/* Discount */}
-            <div className="space-y-1">
-              <Label className="text-xs">Discount (GHS)</Label>
-              <Input
-                type="number"
-                min="0"
-                max={subtotal}
-                placeholder="0.00"
-                value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
-                className="h-8 text-xs"
-              />
-            </div>
-
-            {/* Payment Method */}
-            <div className="space-y-1">
-              <Label className="text-xs">Payment Method</Label>
-              <div className="grid grid-cols-2 gap-1.5">
-                {(Object.keys(PAYMENT_LABELS) as PaymentMethod[]).map((pm) => {
-                  const Icon = PAYMENT_ICONS[pm];
-                  return (
-                    <button
-                      key={pm}
-                      onClick={() => setPaymentMethod(pm)}
-                      className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                        paymentMethod === pm
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border text-muted-foreground hover:bg-muted"
-                      }`}
-                    >
-                      <Icon className="w-3 h-3" />
-                      {PAYMENT_LABELS[pm]}
-                    </button>
-                  );
-                })}
+        {/* Recent transactions — only when not searching */}
+        {!search && (
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">
+              Recent Transactions
+            </p>
+            {(recentSales ?? []).length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground">
+                <ShoppingCart className="w-6 h-6 mx-auto mb-1.5 opacity-30" />
+                <p className="text-xs">No transactions yet</p>
               </div>
-            </div>
-
-            {/* Amount Paid */}
-            {paymentMethod === "cash" && (
-              <div className="space-y-1">
-                <Label className="text-xs">Amount Received (GHS)</Label>
-                <Input
-                  type="number"
-                  min={total}
-                  placeholder={formatCurrency(total)}
-                  value={amountPaid}
-                  onChange={(e) => setAmountPaid(e.target.value)}
-                  className="h-8 text-xs font-bold"
-                />
-                {Number(amountPaid) >= total && (
-                  <p className="text-xs text-emerald-600 font-medium">
-                    Change: {formatCurrency(change)}
-                  </p>
-                )}
+            ) : (
+              <div className="space-y-2">
+                {(recentSales ?? []).map((sale) => (
+                  <div key={sale._id} className="flex items-center gap-3 p-3 rounded-xl border border-border">
+                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <ShoppingCart className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-mono font-semibold">{sale.receiptNumber}</p>
+                      <p className="text-[10px] text-muted-foreground">{formatDateTime(sale.createdAt)}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold">{formatCurrency(sale.total)}</p>
+                      <Badge variant={sale.status === "completed" ? "success" : "danger"} className="text-[10px] px-1.5 py-0">
+                        {sale.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
-
-            {/* Totals */}
-            <Separator />
-            <div className="space-y-1 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span>{formatCurrency(subtotal)}</span>
-              </div>
-              {discountAmt > 0 && (
-                <div className="flex justify-between text-emerald-600">
-                  <span>Discount</span>
-                  <span>-{formatCurrency(discountAmt)}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-base font-bold text-foreground">
-                <span>Total</span>
-                <span>{formatCurrency(total)}</span>
-              </div>
-            </div>
-
-            <Button
-              className="w-full"
-              size="lg"
-              onClick={handleProcessSale}
-              disabled={isProcessing}
-            >
-              {isProcessing ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  Processing…
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 className="w-4 h-4" />
-                  Complete Sale · {formatCurrency(total)}
-                </>
-              )}
-            </Button>
           </div>
         )}
+      </div>
+    </>
+  );
+
+  const CartPane = () => (
+    <>
+      {/* Cart Header */}
+      <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2">
+          {/* Mobile back button */}
+          <button
+            className="lg:hidden p-1 -ml-1 rounded-lg hover:bg-muted transition-colors"
+            onClick={() => setMobileView("products")}
+          >
+            <ChevronRight className="w-4 h-4 rotate-180 text-muted-foreground" />
+          </button>
+          <ShoppingCart className="w-4 h-4 text-muted-foreground" />
+          <span className="font-semibold text-sm">Cart</span>
+          {cart.length > 0 && (
+            <Badge variant="brand" className="text-[10px] px-1.5 py-0">{cart.length}</Badge>
+          )}
+        </div>
+        {cart.length > 0 && (
+          <button
+            onClick={clearCart}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            Clear
+          </button>
+        )}
+      </div>
+
+      {/* Scrollable body: items + checkout form */}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        {cart.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-6">
+            <ShoppingCart className="w-10 h-10 mb-3 opacity-20" />
+            <p className="text-sm font-medium">Cart is empty</p>
+            <p className="text-xs mt-1 text-center">
+              {window.innerWidth < 1024
+                ? "Go back to Products to add items"
+                : "Search and select drugs to add them here"}
+            </p>
+          </div>
+        ) : (
+          <div className="p-4 space-y-3">
+            {/* Cart items */}
+            {cart.map((item) => (
+              <div key={item.inventoryItemId} className="bg-muted/50 rounded-xl p-3">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <p className="text-sm font-medium leading-tight flex-1 min-w-0 pr-1">{item.itemName}</p>
+                  <button
+                    onClick={() => removeFromCart(item.inventoryItemId)}
+                    className="text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => updateQuantity(item.inventoryItemId, -1)}
+                      className="w-6 h-6 rounded-md bg-background border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.inventoryItemId, 1)}
+                      disabled={item.quantity >= item.maxQuantity}
+                      className="w-6 h-6 rounded-md bg-background border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-40"
+                    >
+                      <Plus className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">{formatCurrency(item.unitPrice)} each</p>
+                    <p className="text-sm font-bold">{formatCurrency(item.quantity * item.unitPrice)}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <Separator />
+
+            {/* Checkout form */}
+            <div className="space-y-3">
+              {/* Customer Name */}
+              <div className="space-y-1">
+                <Label className="text-xs">Customer Name (optional)</Label>
+                <Input
+                  placeholder="Walk-in customer"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+
+              {/* Discount */}
+              <div className="space-y-1">
+                <Label className="text-xs">Discount (GHS)</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max={subtotal}
+                  placeholder="0.00"
+                  value={discount}
+                  onChange={(e) => setDiscount(e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+
+              {/* Payment Method */}
+              <div className="space-y-1">
+                <Label className="text-xs">Payment Method</Label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {(Object.keys(PAYMENT_LABELS) as PaymentMethod[]).map((pm) => {
+                    const Icon = PAYMENT_ICONS[pm];
+                    return (
+                      <button
+                        key={pm}
+                        onClick={() => setPaymentMethod(pm)}
+                        className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                          paymentMethod === pm
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <Icon className="w-3 h-3 shrink-0" />
+                        {PAYMENT_LABELS[pm]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Amount Paid */}
+              {paymentMethod === "cash" && (
+                <div className="space-y-1">
+                  <Label className="text-xs">Amount Received (GHS)</Label>
+                  <Input
+                    type="number"
+                    min={total}
+                    placeholder={formatCurrency(total)}
+                    value={amountPaid}
+                    onChange={(e) => setAmountPaid(e.target.value)}
+                    className="h-8 text-xs font-bold"
+                  />
+                  {Number(amountPaid) >= total && total > 0 && (
+                    <p className="text-xs text-emerald-600 font-medium">
+                      Change: {formatCurrency(change)}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Totals */}
+              <div className="bg-muted/50 rounded-xl p-3 space-y-1.5">
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatCurrency(subtotal)}</span>
+                </div>
+                {discountAmt > 0 && (
+                  <div className="flex justify-between text-xs text-emerald-600">
+                    <span>Discount</span>
+                    <span>-{formatCurrency(discountAmt)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm font-bold text-foreground pt-1 border-t border-border/50">
+                  <span>Total</span>
+                  <span>{formatCurrency(total)}</span>
+                </div>
+              </div>
+
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handleProcessSale}
+                disabled={isProcessing}
+              >
+                {isProcessing ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Processing…
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    Complete Sale · {formatCurrency(total)}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+
+  return (
+    <div className="h-[calc(100vh-3.5rem)] flex overflow-hidden">
+      {/* Desktop: side-by-side layout */}
+      {/* Left: Products */}
+      <div className={`flex-1 flex flex-col border-r border-border overflow-hidden ${mobileView === "cart" ? "hidden lg:flex" : "flex"}`}>
+        <ProductsPane />
+      </div>
+
+      {/* Right: Cart */}
+      <div className={`lg:w-80 xl:w-96 flex flex-col bg-card overflow-hidden ${mobileView === "products" ? "hidden lg:flex" : "flex w-full"}`}>
+        <CartPane />
       </div>
 
       {/* Receipt Modal */}

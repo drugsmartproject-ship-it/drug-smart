@@ -20,7 +20,7 @@ import {
   Pill, LayoutDashboard, Package, ShoppingCart, Brain,
   Stethoscope, BarChart3, Users, Settings, LogOut,
   Menu, X, ChevronDown, Bell, Building2, Activity,
-  AlertTriangle, Clock, CheckCheck, Sun, Moon, Monitor,
+  AlertTriangle, Clock, CheckCheck,
 } from "lucide-react";
 
 interface NavItem {
@@ -74,8 +74,6 @@ function NavLink({ item, isActive, onClick }: { item: NavItem; isActive: boolean
     </Link>
   );
 }
-
-type ColorMode = "light" | "dark" | "system";
 
 function NotificationPanel({ pharmacyId }: { pharmacyId: string }) {
   // Static demo notifications — in production these would come from Convex
@@ -147,36 +145,9 @@ function NotificationPanel({ pharmacyId }: { pharmacyId: string }) {
   );
 }
 
-function ColorModeToggle({ mode, setMode }: { mode: ColorMode; setMode: (m: ColorMode) => void }) {
-  const options: { value: ColorMode; icon: React.ElementType; label: string }[] = [
-    { value: "light", icon: Sun, label: "Light" },
-    { value: "dark", icon: Moon, label: "Dark" },
-    { value: "system", icon: Monitor, label: "System" },
-  ];
-  return (
-    <div className="flex items-center gap-0.5 bg-muted rounded-lg p-0.5">
-      {options.map((o) => (
-        <button
-          key={o.value}
-          onClick={() => setMode(o.value)}
-          title={o.label}
-          className={cn(
-            "w-6 h-6 rounded-md flex items-center justify-center transition-all",
-            mode === o.value
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <o.icon className="w-3 h-3" />
-        </button>
-      ))}
-    </div>
-  );
-}
-
 function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
   const { user, pharmacy, logout } = useAuth();
-  const { logoUrl, colorMode, setColorMode, clearAppliedTheme } = useTheme();
+  const { logoUrl, clearAppliedTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const navItems = user ? getNavItems(user.role) : [];
@@ -202,7 +173,6 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
           <p className="text-sm font-bold text-foreground truncate leading-tight">DrugSmart</p>
           <p className="text-xs text-muted-foreground truncate leading-tight">{pharmacy?.displayName ?? pharmacy?.name}</p>
         </div>
-        <ColorModeToggle mode={colorMode} setMode={setColorMode} />
       </div>
 
       {/* Workspace Badge */}

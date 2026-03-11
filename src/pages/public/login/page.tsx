@@ -145,24 +145,23 @@ export default function LoginPage() {
                         </Link>
                       </div>
                       <FormControl>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Your password"
-                            startIcon={<Lock />}
-                            autoComplete="current-password"
-                            className="pr-10"
-                            {...field}
-                          />
-                          <button
-                            type="button"
-                            tabIndex={-1}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                            onClick={() => setShowPassword((v) => !v)}
-                          >
-                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
-                        </div>
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Your password"
+                          startIcon={<Lock />}
+                          endIcon={
+                            <button
+                              type="button"
+                              tabIndex={-1}
+                              className="hover:text-foreground transition-colors"
+                              onClick={() => setShowPassword((v) => !v)}
+                            >
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          }
+                          autoComplete="current-password"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

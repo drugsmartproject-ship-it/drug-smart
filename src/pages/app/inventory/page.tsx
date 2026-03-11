@@ -199,18 +199,35 @@ export default function InventoryPage() {
     return true;
   });
 
+  const emptyState = (
+    <div className="text-center py-14 text-muted-foreground">
+      <Package className="w-8 h-8 mx-auto mb-2 opacity-30" />
+      <p className="text-sm">
+        {search || categoryFilter !== "all" || stockFilter !== "all"
+          ? "No items match your filters"
+          : "No inventory items yet. Add your first drug."}
+      </p>
+      {canManage && !search && categoryFilter === "all" && (
+        <Button size="sm" className="mt-3" onClick={openAdd}>
+          <Plus className="w-3.5 h-3.5" />
+          Add Drug
+        </Button>
+      )}
+    </div>
+  );
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Inventory</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground">Inventory</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {stats?.totalItems ?? 0} drugs · Value: {formatCurrency(stats?.totalValue ?? 0)}
           </p>
         </div>
         {canManage && (
-          <Button onClick={openAdd}>
+          <Button onClick={openAdd} className="w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             Add Drug
           </Button>
@@ -218,39 +235,36 @@ export default function InventoryPage() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
-          { label: "Total Items", value: stats?.totalItems ?? 0, icon: Package, color: "text-blue-600 bg-blue-50" },
-          { label: "Low Stock", value: stats?.lowStock ?? 0, icon: AlertTriangle, color: "text-amber-600 bg-amber-50" },
-          { label: "Out of Stock", value: stats?.outOfStock ?? 0, icon: RefreshCw, color: "text-red-600 bg-red-50" },
-          { label: "Expiring ≤30d", value: stats?.expiringSoon ?? 0, icon: Clock, color: "text-orange-600 bg-orange-50" },
+          { label: "Total Items", value: stats?.totalItems ?? 0, icon: Package, color: "text-blue-600 bg-blue-50 dark:bg-blue-950/40" },
+          { label: "Low Stock", value: stats?.lowStock ?? 0, icon: AlertTriangle, color: "text-amber-600 bg-amber-50 dark:bg-amber-950/40" },
+          { label: "Out of Stock", value: stats?.outOfStock ?? 0, icon: RefreshCw, color: "text-red-600 bg-red-50 dark:bg-red-950/40" },
+          { label: "Expiring ≤30d", value: stats?.expiringSoon ?? 0, icon: Clock, color: "text-orange-600 bg-orange-50 dark:bg-orange-950/40" },
         ].map((s) => (
           <div key={s.label} className="stat-card flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${s.color}`}>
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.color}`}>
               <s.icon className="w-4 h-4" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xl font-bold text-foreground">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
+              <p className="text-xs text-muted-foreground truncate">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-          <Input
-            placeholder="Search drugs by name, generic name, or batch…"
-            className="pl-9"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+        <Input
+          placeholder="Search drugs…"
+          startIcon={<Search />}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1"
+        />
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-52">
-            <Filter className="w-3.5 h-3.5 text-muted-foreground mr-1" />
+          <SelectTrigger className="w-full sm:w-48">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -261,7 +275,7 @@ export default function InventoryPage() {
           </SelectContent>
         </Select>
         <Select value={stockFilter} onValueChange={(v) => setStockFilter(v as typeof stockFilter)}>
-          <SelectTrigger className="w-full sm:w-40">
+          <SelectTrigger className="w-full sm:w-36">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -273,8 +287,8 @@ export default function InventoryPage() {
         </Select>
       </div>
 
-      {/* Table */}
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
+      {/* Desktop Table */}
+      <div className="hidden md:block bg-card rounded-xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
@@ -282,7 +296,7 @@ export default function InventoryPage() {
                 <th>Drug Name</th>
                 <th>Category</th>
                 <th>Stock</th>
-                <th>Selling Price</th>
+                <th>Price</th>
                 <th>Expiry</th>
                 <th>Status</th>
                 {canManage && <th className="text-right">Actions</th>}
@@ -291,20 +305,7 @@ export default function InventoryPage() {
             <tbody>
               {filteredItems.length === 0 ? (
                 <tr>
-                  <td colSpan={canManage ? 7 : 6} className="text-center py-16 text-muted-foreground">
-                    <Package className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    <p className="text-sm">
-                      {search || categoryFilter !== "all" || stockFilter !== "all"
-                        ? "No items match your filters"
-                        : "No inventory items yet. Add your first drug."}
-                    </p>
-                    {canManage && !search && categoryFilter === "all" && (
-                      <Button size="sm" className="mt-3" onClick={openAdd}>
-                        <Plus className="w-3.5 h-3.5" />
-                        Add Drug
-                      </Button>
-                    )}
-                  </td>
+                  <td colSpan={canManage ? 7 : 6}>{emptyState}</td>
                 </tr>
               ) : (
                 filteredItems.map((item) => (
@@ -315,45 +316,26 @@ export default function InventoryPage() {
                           <p className="font-medium text-foreground">{item.name}</p>
                           {item.genericName && <p className="text-xs text-muted-foreground">{item.genericName}</p>}
                           {item.requiresPrescription && (
-                            <span className="text-[10px] text-violet-600 font-medium">Rx Required</span>
+                            <span className="text-[10px] text-violet-600 font-medium">Rx</span>
                           )}
                         </div>
                       </td>
+                      <td><span className="text-xs text-muted-foreground">{item.category}</span></td>
                       <td>
-                        <span className="text-xs text-muted-foreground">{item.category}</span>
-                      </td>
-                      <td>
-                        <div>
-                          <span className="font-medium">{item.quantity}</span>
-                          <span className="text-xs text-muted-foreground ml-1">{item.unit}</span>
-                        </div>
+                        <span className="font-medium">{item.quantity}</span>
+                        <span className="text-xs text-muted-foreground ml-1">{item.unit}</span>
                       </td>
                       <td className="font-medium">{formatCurrency(item.sellingPrice)}</td>
                       <td><ExpiryBadge expiryDate={item.expiryDate} /></td>
                       <td><StockBadge qty={item.quantity} reorderLevel={item.reorderLevel} /></td>
                       {canManage && (
                         <td>
-                          <div className="flex items-center justify-end gap-1.5">
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={(e) => { e.stopPropagation(); setExpandedId(expandedId === item._id ? null : item._id); }}
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={(e) => { e.stopPropagation(); openEdit(item); }}
-                            >
+                          <div className="flex items-center justify-end gap-1">
+                            <Button variant="ghost" size="icon-sm" onClick={(e) => { e.stopPropagation(); openEdit(item); }}>
                               <Edit className="w-3.5 h-3.5" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              className="text-destructive hover:text-destructive"
-                              onClick={(e) => { e.stopPropagation(); handleDeactivate(item._id, item.name); }}
-                            >
+                            <Button variant="ghost" size="icon-sm" className="text-destructive hover:text-destructive"
+                              onClick={(e) => { e.stopPropagation(); handleDeactivate(item._id, item.name); }}>
                               <Trash2 className="w-3.5 h-3.5" />
                             </Button>
                             <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${expandedId === item._id ? "rotate-180" : ""}`} />
@@ -361,27 +343,26 @@ export default function InventoryPage() {
                         </td>
                       )}
                     </tr>
-                    {/* Expanded Row */}
                     {expandedId === item._id && (
-                      <tr key={`${item._id}-expanded`}>
+                      <tr key={`${item._id}-exp`}>
                         <td colSpan={canManage ? 7 : 6} className="bg-muted/30 px-4 py-3">
                           <div className="grid sm:grid-cols-3 gap-4 text-xs">
                             <div>
                               <p className="font-semibold text-muted-foreground mb-1">Pricing</p>
-                              <p>Cost Price: <strong>{formatCurrency(item.costPrice)}</strong></p>
-                              <p>Selling Price: <strong>{formatCurrency(item.sellingPrice)}</strong></p>
+                              <p>Cost: <strong>{formatCurrency(item.costPrice)}</strong></p>
+                              <p>Selling: <strong>{formatCurrency(item.sellingPrice)}</strong></p>
                               <p>Margin: <strong>{item.costPrice > 0 ? ((item.sellingPrice - item.costPrice) / item.costPrice * 100).toFixed(1) : "—"}%</strong></p>
                             </div>
                             <div>
                               <p className="font-semibold text-muted-foreground mb-1">Stock Info</p>
-                              <p>Reorder Level: <strong>{item.reorderLevel} {item.unit}</strong></p>
+                              <p>Reorder at: <strong>{item.reorderLevel} {item.unit}</strong></p>
                               <p>Batch: <strong>{item.batchNumber ?? "—"}</strong></p>
                               <p>Supplier: <strong>{item.supplierName ?? "—"}</strong></p>
                             </div>
                             <div>
                               <p className="font-semibold text-muted-foreground mb-1">Details</p>
                               <p>Storage: <strong>{item.storageCondition ?? "—"}</strong></p>
-                              {item.description && <p>Notes: {item.description}</p>}
+                              {item.description && <p className="mt-0.5 text-muted-foreground">{item.description}</p>}
                             </div>
                           </div>
                         </td>
@@ -393,6 +374,64 @@ export default function InventoryPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-2">
+        {filteredItems.length === 0 ? emptyState : filteredItems.map((item) => (
+          <div key={item._id} className="bg-card rounded-xl border border-border overflow-hidden">
+            {/* Card header — always visible */}
+            <button
+              className="w-full flex items-start gap-3 p-3.5 text-left"
+              onClick={() => setExpandedId(expandedId === item._id ? null : item._id)}
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-foreground truncate">{item.name}</p>
+                    {item.genericName && (
+                      <p className="text-xs text-muted-foreground truncate">{item.genericName}</p>
+                    )}
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 mt-0.5 transition-transform ${expandedId === item._id ? "rotate-180" : ""}`} />
+                </div>
+                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                  <StockBadge qty={item.quantity} reorderLevel={item.reorderLevel} />
+                  <ExpiryBadge expiryDate={item.expiryDate} />
+                  <span className="text-xs text-muted-foreground">{item.quantity} {item.unit}</span>
+                  <span className="text-xs font-semibold text-foreground">{formatCurrency(item.sellingPrice)}</span>
+                </div>
+              </div>
+            </button>
+
+            {/* Expanded details */}
+            {expandedId === item._id && (
+              <div className="border-t border-border/60 px-3.5 py-3 bg-muted/30 space-y-2.5">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                  <div><span className="text-muted-foreground">Category</span><p className="font-medium">{item.category}</p></div>
+                  <div><span className="text-muted-foreground">Cost Price</span><p className="font-medium">{formatCurrency(item.costPrice)}</p></div>
+                  <div><span className="text-muted-foreground">Reorder at</span><p className="font-medium">{item.reorderLevel} {item.unit}</p></div>
+                  <div><span className="text-muted-foreground">Supplier</span><p className="font-medium truncate">{item.supplierName ?? "—"}</p></div>
+                  {item.batchNumber && <div><span className="text-muted-foreground">Batch</span><p className="font-medium">{item.batchNumber}</p></div>}
+                  {item.storageCondition && <div className="col-span-2"><span className="text-muted-foreground">Storage</span><p className="font-medium">{item.storageCondition}</p></div>}
+                </div>
+                {canManage && (
+                  <div className="flex items-center gap-2 pt-1">
+                    <Button variant="outline" size="sm" className="flex-1 h-8 text-xs" onClick={() => openEdit(item)}>
+                      <Edit className="w-3.5 h-3.5" />
+                      Edit
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1 h-8 text-xs text-destructive hover:text-destructive border-destructive/30"
+                      onClick={() => handleDeactivate(item._id, item.name)}>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      Remove
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* Add/Edit Dialog */}

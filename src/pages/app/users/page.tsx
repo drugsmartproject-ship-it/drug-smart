@@ -95,12 +95,12 @@ export default function UsersPage() {
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Users className="w-6 h-6 text-primary" />
+          <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             User Management
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
@@ -108,7 +108,7 @@ export default function UsersPage() {
           </p>
         </div>
         {["owner", "admin"].includes(user?.role ?? "") && (
-          <Button onClick={() => setShowAddDialog(true)}>
+          <Button onClick={() => setShowAddDialog(true)} className="w-full sm:w-auto">
             <Plus className="w-4 h-4" />
             Add Staff Member
           </Button>
@@ -116,7 +116,7 @@ export default function UsersPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
         {[
           { label: "Total Users", value: stats?.total ?? 0 },
           { label: "Active", value: stats?.active ?? 0 },
@@ -141,8 +141,8 @@ export default function UsersPage() {
         />
       </div>
 
-      {/* Users Table */}
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
+      {/* Users — Table on desktop, cards on mobile */}
+      <div className="hidden sm:block bg-card rounded-xl border border-border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
@@ -172,15 +172,15 @@ export default function UsersPage() {
                     <tr key={u._id}>
                       <td>
                         <div className="flex items-center gap-3">
-                          <Avatar className="h-9 w-9">
+                          <Avatar className="h-9 w-9 shrink-0">
                             <AvatarFallback>{initials(u.name)}</AvatarFallback>
                           </Avatar>
-                          <div>
-                            <div className="flex items-center gap-2">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <p className="font-medium text-foreground">{u.name}</p>
                               {isCurrentUser && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">You</Badge>}
                             </div>
-                            <p className="text-xs text-muted-foreground">{u.email}</p>
+                            <p className="text-xs text-muted-foreground truncate">{u.email}</p>
                           </div>
                         </div>
                       </td>
@@ -247,6 +247,78 @@ export default function UsersPage() {
         </div>
       </div>
 
+      {/* Mobile cards */}
+      <div className="sm:hidden space-y-3">
+        {filteredUsers.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <Users className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            <p className="text-sm">{search ? "No users match your search" : "No staff members yet"}</p>
+          </div>
+        ) : (
+          filteredUsers.map((u) => {
+            const isCurrentUser = u._id === user?.id;
+            const isOwner = u.role === "owner";
+            const canEdit = !isCurrentUser && !isOwner && ["owner", "admin"].includes(user?.role ?? "");
+
+            return (
+              <div key={u._id} className="bg-card rounded-xl border border-border p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar className="h-10 w-10 shrink-0">
+                      <AvatarFallback>{initials(u.name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <p className="font-semibold text-sm text-foreground">{u.name}</p>
+                        {isCurrentUser && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">You</Badge>}
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">Joined {formatDate(u.createdAt)}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <Badge variant={roleVariant[u.role]} className="text-xs">
+                      {isOwner && <ShieldCheck className="w-3 h-3 mr-1" />}
+                      {ROLE_LABELS[u.role]}
+                    </Badge>
+                    <Badge variant={u.isActive ? "success" : "secondary"} className="text-xs">
+                      {u.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                </div>
+                {canEdit && (
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/60">
+                    <Select
+                      value={u.role}
+                      onValueChange={(v) => handleRoleChange(u._id, v as Exclude<UserRole, "owner">, u.name)}
+                    >
+                      <SelectTrigger className="h-8 w-36 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ASSIGNABLE_ROLES.map((r) => (
+                          <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <div className="flex items-center gap-1.5">
+                      <Switch
+                        checked={u.isActive}
+                        onCheckedChange={() => handleToggleActive(u._id, u.isActive, u.name)}
+                        className="scale-75"
+                      />
+                      {u.isActive
+                        ? <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
+                        : <UserX className="w-3.5 h-3.5 text-muted-foreground" />}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
       {/* Add Staff Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
         <DialogContent>
@@ -285,22 +357,21 @@ export default function UsersPage() {
             </div>
             <div className="space-y-1.5">
               <Label>Initial Password *</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="At least 8 characters"
-                  value={form.password}
-                  onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  onClick={() => setShowPassword((v) => !v)}
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="At least 8 characters"
+                value={form.password}
+                onChange={(e) => setForm((p) => ({ ...p, password: e.target.value }))}
+                endIcon={
+                  <button
+                    type="button"
+                    className="hover:text-foreground transition-colors"
+                    onClick={() => setShowPassword((v) => !v)}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                }
+              />
               <p className="text-xs text-muted-foreground">Staff should change this password on first login</p>
             </div>
           </div>

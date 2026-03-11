@@ -4,7 +4,11 @@ export type ThemeId =
   | "clean-blue"
   | "slate-professional"
   | "warm-clinical"
-  | "deep-indigo";
+  | "deep-indigo"
+  | "midnight-steel"
+  | "ocean-blue"
+  | "sage-clinical"
+  | "violet-prestige";
 
 export interface ThemeVars {
   primary: string;
@@ -148,6 +152,86 @@ export const THEME_PRESETS: ThemePreset[] = [
       brandTealDark: "#6D28D9",
       brandGreenLight: "#EEF2FF",
       brandTealLight: "#EDE9FE",
+    },
+  },
+  {
+    id: "midnight-steel",
+    name: "Midnight Steel",
+    description: "Deep navy + sky blue — authoritative, executive",
+    primaryHex: "#1E3A5F",
+    accentHex: "#38BDF8",
+    vars: {
+      primary: "hsl(213 52% 24%)",
+      primaryForeground: "hsl(0 0% 100%)",
+      accent: "hsl(199 95% 60%)",
+      accentForeground: "hsl(0 0% 100%)",
+      ring: "hsl(213 52% 24%)",
+      brandGreen: "#1E3A5F",
+      brandTeal: "#38BDF8",
+      brandGreenDark: "#152B47",
+      brandTealDark: "#0EA5E9",
+      brandGreenLight: "#EFF6FF",
+      brandTealLight: "#E0F2FE",
+    },
+  },
+  {
+    id: "ocean-blue",
+    name: "Ocean Blue",
+    description: "Rich cobalt + cyan — sharp, clinical confidence",
+    primaryHex: "#0369A1",
+    accentHex: "#0891B2",
+    vars: {
+      primary: "hsl(201 98% 33%)",
+      primaryForeground: "hsl(0 0% 100%)",
+      accent: "hsl(192 91% 36%)",
+      accentForeground: "hsl(0 0% 100%)",
+      ring: "hsl(201 98% 33%)",
+      brandGreen: "#0369A1",
+      brandTeal: "#0891B2",
+      brandGreenDark: "#025280",
+      brandTealDark: "#0670A2",
+      brandGreenLight: "#E0F2FE",
+      brandTealLight: "#CFFAFE",
+    },
+  },
+  {
+    id: "sage-clinical",
+    name: "Sage Clinical",
+    description: "Muted sage + teal — calm, natural, therapeutic",
+    primaryHex: "#4D7C6F",
+    accentHex: "#2DD4BF",
+    vars: {
+      primary: "hsl(165 23% 40%)",
+      primaryForeground: "hsl(0 0% 100%)",
+      accent: "hsl(174 72% 51%)",
+      accentForeground: "hsl(0 0% 100%)",
+      ring: "hsl(165 23% 40%)",
+      brandGreen: "#4D7C6F",
+      brandTeal: "#2DD4BF",
+      brandGreenDark: "#3A5F54",
+      brandTealDark: "#14B8A6",
+      brandGreenLight: "#F0FDF9",
+      brandTealLight: "#CCFBF1",
+    },
+  },
+  {
+    id: "violet-prestige",
+    name: "Violet Prestige",
+    description: "Deep violet + indigo — premium, distinctive",
+    primaryHex: "#5B21B6",
+    accentHex: "#4F46E5",
+    vars: {
+      primary: "hsl(263 72% 42%)",
+      primaryForeground: "hsl(0 0% 100%)",
+      accent: "hsl(243 75% 59%)",
+      accentForeground: "hsl(0 0% 100%)",
+      ring: "hsl(263 72% 42%)",
+      brandGreen: "#5B21B6",
+      brandTeal: "#4F46E5",
+      brandGreenDark: "#4C1D95",
+      brandTealDark: "#4338CA",
+      brandGreenLight: "#F5F3FF",
+      brandTealLight: "#EEF2FF",
     },
   },
 ];
